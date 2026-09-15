@@ -104,11 +104,13 @@
   .field{margin-bottom:14px;}
   .field:last-child{margin-bottom:0;}
   .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px;}
-  .field input[type=text],.field input[type=date],.field select,.field textarea{
+  .field input[type=text],.field input[type=date],.field select,.field textarea,
+  .autocomplete input[type=text]{
     width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:8px;
     background:#F7FAFC;color:var(--ink);outline:none;
   }
-  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);background:#fff;}
+  .field input:focus,.field select:focus,.field textarea:focus,
+  .autocomplete input[type=text]:focus{border-color:var(--primary);background:#fff;}
   .field textarea{resize:vertical;min-height:70px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
   .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
@@ -229,6 +231,8 @@
   .kpi .val{font-family:'Lora',serif;font-size:30px;font-weight:600;color:var(--primary);}
   .kpi .lbl{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
   .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:18px;}
+  .dash-grid-even{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch;}
+  .dash-grid-even .panel{display:flex;flex-direction:column;}
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
   .panel h3{margin:0 0 16px;font-size:15px;}
   .bar-row{display:grid;grid-template-columns:150px 1fr 34px;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px;}
@@ -245,6 +249,32 @@
   /* Students view */
   .stu-controls{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
   .stu-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+
+  /* Línea del tiempo de seguimiento */
+  .timeline{display:flex;flex-direction:column;}
+  .tl-item{position:relative;padding-left:26px;padding-bottom:22px;margin-left:5px;border-left:2px solid var(--border);}
+  .tl-item:last-child{border-left-color:transparent;padding-bottom:2px;}
+  .tl-dot{position:absolute;left:-7px;top:2px;width:12px;height:12px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px var(--border);}
+  .tl-dot.tl-incidente{background:var(--grave);}
+  .tl-dot.tl-Compromiso{background:var(--primary);}
+  .tl-dot.tl-Avancepositivo{background:var(--leve);}
+  .tl-dot.tl-Avancenegativo{background:var(--grave);}
+  .tl-dot.tl-Sincambios{background:var(--moderada);}
+  .tl-dot.tl-Cierre{background:var(--ink-faint);}
+  .tl-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:12px 14px;}
+  .tl-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:5px;}
+  .tl-top .tl-fecha{font-size:12px;color:var(--ink-faint);}
+  .tl-top .tl-etiqueta{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;}
+  .tl-etiqueta.tl-incidente{background:var(--grave-bg);color:var(--grave);}
+  .tl-etiqueta.tl-Compromiso{background:var(--primary-light);color:var(--primary);}
+  .tl-etiqueta.tl-Avancepositivo{background:var(--leve-bg);color:var(--leve);}
+  .tl-etiqueta.tl-Avancenegativo{background:var(--grave-bg);color:var(--grave);}
+  .tl-etiqueta.tl-Sincambios{background:var(--moderada-bg);color:var(--moderada);}
+  .tl-etiqueta.tl-Cierre{background:var(--surface-2);color:var(--ink-soft);}
+  .tl-desc{font-size:13.5px;color:var(--ink);margin:0;}
+  .tl-por{font-size:11.5px;color:var(--ink-faint);margin-top:6px;}
+  .tl-del{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:11px;margin-left:auto;}
+  .tl-del:hover{color:var(--grave);}
   .stu-card{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:14px 16px;cursor:pointer;}
   .stu-card:hover{border-color:var(--primary);}
   .stu-card .name{font-weight:600;font-size:13.5px;}
@@ -269,6 +299,8 @@
   .login-logo{width:76px;margin:0 auto 14px;display:block;border-radius:10px;}
   .login-card h1{font-size:20px;margin:0 0 2px;font-family:'Lora',serif;}
   .login-card > p{margin:0 0 26px;color:var(--ink-soft);font-size:13px;}
+  .login-panel{text-align:left;}
+  .login-error{color:var(--grave);font-size:12.5px;margin:10px 0 0;}
   .login-roles{display:flex;flex-direction:column;gap:10px;}
   .role-card{
     display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;
@@ -278,13 +310,18 @@
   .role-card svg{width:22px;height:22px;color:var(--primary);margin-bottom:6px;}
   .role-card b{font-size:14.5px;}
   .role-card span{font-size:12px;color:var(--ink-soft);}
-  .login-panel{text-align:left;}
-  .login-back{background:none;border:none;color:var(--ink-soft);font-size:12.5px;cursor:pointer;margin-bottom:16px;padding:0;}
-  .login-back:hover{color:var(--primary);}
   .login-teacher-list{max-height:260px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-top:12px;}
   .login-teacher-item{padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13.5px;border:1px solid transparent;}
   .login-teacher-item:hover{background:var(--primary-light);border-color:var(--border);}
-  .login-error{color:var(--grave);font-size:12.5px;margin:10px 0 0;}
+  .load-spinner{
+    width:34px;height:34px;margin:6px auto 16px;border-radius:50%;
+    border:3px solid var(--primary-light);border-top-color:var(--primary);
+    animation:load-spin .8s linear infinite;
+  }
+  @keyframes load-spin{ to{ transform:rotate(360deg); } }
+  .load-status-text{color:var(--primary);font-size:15px;font-weight:700;margin:0;}
+  .back-link{background:none;border:none;color:var(--ink-soft);font-size:12.5px;cursor:pointer;padding:0;}
+  .back-link:hover{color:var(--primary);}
 
   /* Sesión activa (sidebar) */
   .session-box{
@@ -330,9 +367,11 @@
     main{padding:78px 16px 22px;max-width:100%;}
     .kpis{grid-template-columns:1fr 1fr;}
     .dash-grid{grid-template-columns:1fr;}
+    .dash-grid-even{grid-template-columns:1fr;}
     .row2,.row3{grid-template-columns:1fr;}
   }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <div id="login-screen" class="login-screen">
@@ -341,7 +380,16 @@
     <h1>Los Sauces</h1>
     <p>Incidencias de comportamiento</p>
 
-    <div id="login-role-select" class="login-roles">
+    <div id="load-status" class="login-panel" style="text-align:center;padding:8px 0;">
+      <div class="load-spinner" id="load-spinner" aria-hidden="true"></div>
+      <p id="load-status-text" class="load-status-text">Cargando datos…</p>
+      <div id="load-status-error" style="display:none;">
+        <p class="login-error" id="load-status-error-text" style="margin-bottom:14px;"></p>
+        <button class="btn btn-primary" id="btn-retry-load" style="width:100%;">Reintentar</button>
+      </div>
+    </div>
+
+    <div id="login-role-select" class="login-roles" style="display:none;">
       <button class="role-card" data-role="teacher">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg>
         <b>Profesor</b>
@@ -355,7 +403,7 @@
     </div>
 
     <div id="login-teacher-panel" class="login-panel" style="display:none;">
-      <button class="login-back" id="teacher-back">&larr; Regresar</button>
+      <button class="back-link" id="teacher-back" style="margin-bottom:16px;">&larr; Regresar</button>
       <div class="field">
         <label>Selecciona tu nombre</label>
         <input type="text" id="login-teacher-search" placeholder="Buscar docente…" autocomplete="off">
@@ -364,7 +412,7 @@
     </div>
 
     <div id="login-admin-panel" class="login-panel" style="display:none;">
-      <button class="login-back" id="admin-back">&larr; Regresar</button>
+      <button class="back-link" id="admin-back" style="margin-bottom:16px;">&larr; Regresar</button>
       <div class="field">
         <label>Clave de administrador</label>
         <input type="password" id="login-admin-pass" placeholder="Clave de acceso">
@@ -408,6 +456,10 @@
       <button class="navbtn" data-view="alumnos">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/></svg>
         Alumnos <span class="count" id="nav-count-alumnos">0</span>
+      </button>
+      <button class="navbtn" data-view="seguimientos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="2"/><circle cx="6" cy="12" r="2"/><circle cx="6" cy="18" r="2"/><path d="M10 6h10M10 12h10M10 18h10"/></svg>
+        Seguimientos <span class="count" id="nav-count-seguimientos">0</span>
       </button>
       <button class="navbtn" data-view="docentes">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/></svg>
@@ -573,6 +625,32 @@
         <h2>Reportes y estadísticas</h2>
         <p>Panorama general del comportamiento en el colegio.</p>
       </div>
+      <div class="filters">
+        <div class="field" id="dash-f-profesor-wrap">
+          <label>Profesor</label>
+          <select id="dash-f-profesor"><option value="">Todos</option></select>
+        </div>
+        <div class="field autocomplete grow">
+          <label>Alumno</label>
+          <input type="text" id="dash-f-alumno" placeholder="Buscar alumno…" autocomplete="off">
+          <div class="ac-results" id="dash-alumno-ac-results"></div>
+        </div>
+        <div class="field">
+          <label>Sección</label>
+          <select id="dash-f-seccion">
+            <option value="">Todas las secciones</option>
+            <option>Primaria Baja</option>
+            <option>Primaria Alta</option>
+            <option>Secundaria</option>
+            <option>Preparatoria</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Grado</label>
+          <select id="dash-f-grado"><option value="">Todos</option></select>
+        </div>
+        <button class="btn btn-ghost" id="dash-f-limpiar">Limpiar filtros</button>
+      </div>
       <div class="kpis">
         <div class="kpi"><div class="val" id="kpi-total">0</div><div class="lbl">Incidencias totales</div></div>
         <div class="kpi"><div class="val" id="kpi-abiertas">0</div><div class="lbl">Abiertas / en seguimiento</div></div>
@@ -585,19 +663,43 @@
           <div id="chart-tipo"></div>
         </div>
         <div class="panel">
-          <h3>Alumnos con más incidencias</h3>
-          <div class="top-students" id="top-students"></div>
-        </div>
-      </div>
-      <div class="dash-grid">
-        <div class="panel">
           <h3>Incidencias por grado</h3>
           <div id="chart-grado"></div>
         </div>
+      </div>
+      <div class="dash-grid-even">
+        <div class="panel" id="panel-top-students">
+          <h3>Alumnos con más incidencias</h3>
+          <div class="top-students" id="top-students"></div>
+        </div>
+        <div class="panel" id="panel-top-teachers">
+          <h3>Profesores con más incidencias</h3>
+          <div class="top-students" id="top-teachers"></div>
+        </div>
+      </div>
+      <div class="dash-grid-even">
         <div class="panel">
           <h3>Subclasificaciones más frecuentes</h3>
           <div id="chart-subtipo"></div>
         </div>
+        <div class="panel">
+          <h3>Incidencias por lugar</h3>
+          <div id="chart-lugar"></div>
+        </div>
+      </div>
+      <div class="dash-grid-even">
+        <div class="panel">
+          <h3>Incidencias por gravedad</h3>
+          <div id="chart-gravedad"></div>
+        </div>
+        <div class="panel">
+          <h3>Incidencias por estado</h3>
+          <div id="chart-estado"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Incidencias a lo largo del tiempo</h3>
+        <div id="chart-linea"></div>
       </div>
     </section>
 
@@ -616,6 +718,33 @@
         </div>
       </div>
       <div class="stu-grid" id="stu-grid"></div>
+    </section>
+
+    <!-- VIEW: SEGUIMIENTOS -->
+    <section class="view" id="view-seguimientos">
+      <div class="view-header">
+        <h2>Seguimientos</h2>
+        <p>Compromisos y avances de cada alumno a lo largo del tiempo.</p>
+      </div>
+      <div class="autocomplete" style="max-width:560px;margin-bottom:20px;">
+        <input type="text" id="seg-buscar-alumno" placeholder="Buscar alumno para ver su línea del tiempo…" autocomplete="off">
+        <div class="ac-results" id="seg-ac-results"></div>
+      </div>
+      <div id="seg-lista-alumnos">
+        <p style="color:var(--ink-soft);font-size:13px;margin:0 0 12px;">Alumnos con incidencias registradas:</p>
+        <div class="stu-grid" id="seg-alumnos-grid"></div>
+      </div>
+      <div id="seg-content" style="display:none;">
+        <button class="back-link" id="seg-volver" style="margin-bottom:14px;">&larr; Volver a la lista</button>
+        <div class="panel" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <h3 id="seg-alumno-nombre" style="margin:0;"></h3>
+            <button class="btn btn-primary" id="seg-btn-nuevo">+ Nuevo seguimiento</button>
+          </div>
+          <p id="seg-alumno-meta" style="color:var(--ink-soft);font-size:13px;margin:4px 0 0;"></p>
+        </div>
+        <div id="seg-timeline"></div>
+      </div>
     </section>
 
     <!-- VIEW: DOCENTES -->
@@ -651,41 +780,224 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ---------- DATA: alumnos importados del Excel "Listas alumnos Sauces 2026-2027" ---------- */
-const STUDENTS = [{"id": 1, "nombre": "Andrade Romano Daniel", "grado": "1°", "grupo": "A"}, {"id": 2, "nombre": "Blasco Abreu Jorge", "grado": "1°", "grupo": "A"}, {"id": 3, "nombre": "Castillo Cabrera Matias", "grado": "1°", "grupo": "A"}, {"id": 4, "nombre": "Cruz García Saroo André", "grado": "1°", "grupo": "A"}, {"id": 5, "nombre": "Espina Zairick Iñigo", "grado": "1°", "grupo": "A"}, {"id": 6, "nombre": "Gutiérrez Téllez María Camila", "grado": "1°", "grupo": "A"}, {"id": 7, "nombre": "Jiménez Magaña Emiliano", "grado": "1°", "grupo": "A"}, {"id": 8, "nombre": "Lopez Carreto Luis Francisco", "grado": "1°", "grupo": "A"}, {"id": 9, "nombre": "Lutrillo Pineda Luis Santiago", "grado": "1°", "grupo": "A"}, {"id": 10, "nombre": "Mártinez Carriles María Fernanda", "grado": "1°", "grupo": "A"}, {"id": 11, "nombre": "Martínez Montes Lucia", "grado": "1°", "grupo": "A"}, {"id": 12, "nombre": "Nieva Rojas Romina", "grado": "1°", "grupo": "A"}, {"id": 13, "nombre": "Orozco Zarco Valentina", "grado": "1°", "grupo": "A"}, {"id": 14, "nombre": "Pérez Cano Matteo", "grado": "1°", "grupo": "A"}, {"id": 15, "nombre": "Ponce Vázquez Bárbara", "grado": "1°", "grupo": "A"}, {"id": 16, "nombre": "Reyes Espinosa Sara Nicole", "grado": "1°", "grupo": "A"}, {"id": 17, "nombre": "Sánchez Estrada Ana Julia", "grado": "1°", "grupo": "A"}, {"id": 18, "nombre": "Sánchez Fernández Valentina", "grado": "1°", "grupo": "A"}, {"id": 19, "nombre": "Solana Rodríguez Arantxa", "grado": "1°", "grupo": "A"}, {"id": 20, "nombre": "Valdés Cortés Jana", "grado": "1°", "grupo": "A"}, {"id": 21, "nombre": "Ventura Rivero Sofía", "grado": "1°", "grupo": "A"}, {"id": 22, "nombre": "Zanella Cabral María", "grado": "1°", "grupo": "A"}, {"id": 23, "nombre": "Álvarez Montes Laino", "grado": "1°", "grupo": "B"}, {"id": 24, "nombre": "Castillo Espinoza Mateo", "grado": "1°", "grupo": "B"}, {"id": 25, "nombre": "Centeno Espina Patricio", "grado": "1°", "grupo": "B"}, {"id": 26, "nombre": "Del Castillo Álvarez del Castillo Ane", "grado": "1°", "grupo": "B"}, {"id": 27, "nombre": "Estrada Camino José María", "grado": "1°", "grupo": "B"}, {"id": 28, "nombre": "García Avalos Camila", "grado": "1°", "grupo": "B"}, {"id": 29, "nombre": "Lobato Luna María José", "grado": "1°", "grupo": "B"}, {"id": 30, "nombre": "López López Martina", "grado": "1°", "grupo": "B"}, {"id": 31, "nombre": "Méndez Medina José", "grado": "1°", "grupo": "B"}, {"id": 32, "nombre": "Morodo Compan Luis Javier", "grado": "1°", "grupo": "B"}, {"id": 33, "nombre": "Ojeda Cánovas Juan Pablo", "grado": "1°", "grupo": "B"}, {"id": 34, "nombre": "Orduña Rodríguez Thiago", "grado": "1°", "grupo": "B"}, {"id": 35, "nombre": "Reyes Cubas Natalia Sofia", "grado": "1°", "grupo": "B"}, {"id": 36, "nombre": "Reyes Espinosa Martha Ximena", "grado": "1°", "grupo": "B"}, {"id": 37, "nombre": "Ruiz Garrido María Paula", "grado": "1°", "grupo": "B"}, {"id": 38, "nombre": "Sierra Montes Almudena", "grado": "1°", "grupo": "B"}, {"id": 39, "nombre": "Solórzano Millán María José", "grado": "1°", "grupo": "B"}, {"id": 40, "nombre": "Techachal Mondragón María Elena", "grado": "1°", "grupo": "B"}, {"id": 41, "nombre": "Tenorio López Ana Paola", "grado": "1°", "grupo": "B"}, {"id": 42, "nombre": "Trejo Zapien Leonardo", "grado": "1°", "grupo": "B"}, {"id": 43, "nombre": "Trueba Arena María", "grado": "1°", "grupo": "B"}, {"id": 44, "nombre": "Valdés Cortés Jana", "grado": "1°", "grupo": "B"}, {"id": 45, "nombre": "Zilli Ortiz de Montellano Sergio", "grado": "1°", "grupo": "B"}, {"id": 46, "nombre": "Anaya Zairik Carlota", "grado": "2°", "grupo": "A"}, {"id": 47, "nombre": "Arena Albrecht Juan Pablo", "grado": "2°", "grupo": "A"}, {"id": 48, "nombre": "Castro Chong Emilia", "grado": "2°", "grupo": "A"}, {"id": 49, "nombre": "Contreras Espinoza Jonathan", "grado": "2°", "grupo": "A"}, {"id": 50, "nombre": "Cumming Hernández Rodrigo", "grado": "2°", "grupo": "A"}, {"id": 51, "nombre": "Del Castillo Straffon Franco", "grado": "2°", "grupo": "A"}, {"id": 52, "nombre": "Ezquer Rosette Cassandra", "grado": "2°", "grupo": "A"}, {"id": 53, "nombre": "González Muciño Santiago", "grado": "2°", "grupo": "A"}, {"id": 54, "nombre": "Navarro Rivero Javier", "grado": "2°", "grupo": "A"}, {"id": 55, "nombre": "Pérez Avendaño Eduardo", "grado": "2°", "grupo": "A"}, {"id": 56, "nombre": "Quiroz Ramírez Emma Larissa", "grado": "2°", "grupo": "A"}, {"id": 57, "nombre": "Ramirez Ávila Diana Victoria", "grado": "2°", "grupo": "A"}, {"id": 58, "nombre": "Rodriguez Linares Narvaez Álvaro", "grado": "2°", "grupo": "A"}, {"id": 59, "nombre": "Sánchez Estrada Luisa María", "grado": "2°", "grupo": "A"}, {"id": 60, "nombre": "Sánchez Rábago Elisa", "grado": "2°", "grupo": "A"}, {"id": 61, "nombre": "Alonso Romano Constanza", "grado": "2°", "grupo": "B"}, {"id": 62, "nombre": "Álvarez Cervantes Sofía", "grado": "2°", "grupo": "B"}, {"id": 63, "nombre": "Ayuso Galán Costanza Pilar", "grado": "2°", "grupo": "B"}, {"id": 64, "nombre": "Barbieri Rodríguez Luca", "grado": "2°", "grupo": "B"}, {"id": 65, "nombre": "Castillo Zuliani Juan Francisco", "grado": "2°", "grupo": "B"}, {"id": 66, "nombre": "Hochtrasser Olvera Julieta", "grado": "2°", "grupo": "B"}, {"id": 67, "nombre": "Moreno Escondrillas Ferrán", "grado": "2°", "grupo": "B"}, {"id": 68, "nombre": "Prado Rodall Luciano", "grado": "2°", "grupo": "B"}, {"id": 69, "nombre": "Ramirez Valencia Emiliano", "grado": "2°", "grupo": "B"}, {"id": 70, "nombre": "Reyes Espinosa Juan Pablo", "grado": "2°", "grupo": "B"}, {"id": 71, "nombre": "Rivera Salinas Olivia", "grado": "2°", "grupo": "B"}, {"id": 72, "nombre": "Titla Otero Camila Lizeth", "grado": "2°", "grupo": "B"}, {"id": 73, "nombre": "Trejo Zapien Rodrigo", "grado": "2°", "grupo": "B"}, {"id": 74, "nombre": "Vargas Rendón Natalia", "grado": "2°", "grupo": "B"}, {"id": 75, "nombre": "Zafra Vázquez Carlota", "grado": "2°", "grupo": "B"}, {"id": 76, "nombre": "Anaya Zairick Mateo", "grado": "3°", "grupo": "A"}, {"id": 77, "nombre": "Bautista González Santiago", "grado": "3°", "grupo": "A"}, {"id": 78, "nombre": "Cariño García Ainhoa", "grado": "3°", "grupo": "A"}, {"id": 79, "nombre": "Curiel Benitez Aranza", "grado": "3°", "grupo": "A"}, {"id": 80, "nombre": "Fitzmaurice Munguia Antonella", "grado": "3°", "grupo": "A"}, {"id": 81, "nombre": "Franco Flores Elias", "grado": "3°", "grupo": "A"}, {"id": 82, "nombre": "García Becerra Martina", "grado": "3°", "grupo": "A"}, {"id": 83, "nombre": "Heredia Pacheco Rebeca", "grado": "3°", "grupo": "A"}, {"id": 84, "nombre": "Howe Bernardi José Miguel", "grado": "3°", "grupo": "A"}, {"id": 85, "nombre": "Medina Rodal Diego", "grado": "3°", "grupo": "A"}, {"id": 86, "nombre": "Méndez Medina Ángel", "grado": "3°", "grupo": "A"}, {"id": 87, "nombre": "Mirón Kuri José Ignacio", "grado": "3°", "grupo": "A"}, {"id": 88, "nombre": "Navarro Rivero Sergio", "grado": "3°", "grupo": "A"}, {"id": 89, "nombre": "Parra Galeazzi Irenka", "grado": "3°", "grupo": "A"}, {"id": 90, "nombre": "Plata Diez de Urdanivia Almudena", "grado": "3°", "grupo": "A"}, {"id": 91, "nombre": "Rivera Ávila Gerardo", "grado": "3°", "grupo": "A"}, {"id": 92, "nombre": "Sánchez Jimenez Roberto", "grado": "3°", "grupo": "A"}, {"id": 93, "nombre": "Santiago Silva Valeria", "grado": "3°", "grupo": "A"}, {"id": 94, "nombre": "Sierra Montes Rodolfo", "grado": "3°", "grupo": "A"}, {"id": 95, "nombre": "Solano Hernández José Manuel", "grado": "3°", "grupo": "A"}, {"id": 96, "nombre": "Treviño Muñoz Marcela", "grado": "3°", "grupo": "A"}, {"id": 97, "nombre": "Álvarez De la Via Mateo", "grado": "3°", "grupo": "B"}, {"id": 98, "nombre": "Álvarez Montes Santino", "grado": "3°", "grupo": "B"}, {"id": 99, "nombre": "Arena Ortiz Bosco", "grado": "3°", "grupo": "B"}, {"id": 100, "nombre": "Athié Leal Miguel", "grado": "3°", "grupo": "B"}, {"id": 101, "nombre": "Castillo Morales Santiago", "grado": "3°", "grupo": "B"}, {"id": 102, "nombre": "Dominici Torres Anna Isabella", "grado": "3°", "grupo": "B"}, {"id": 103, "nombre": "Espina Zairick Diego", "grado": "3°", "grupo": "B"}, {"id": 104, "nombre": "Falcón Cosio Mateo", "grado": "3°", "grupo": "B"}, {"id": 105, "nombre": "Flores González Andrés", "grado": "3°", "grupo": "B"}, {"id": 106, "nombre": "Franco Rosete María", "grado": "3°", "grupo": "B"}, {"id": 107, "nombre": "González De Unanue Sofía", "grado": "3°", "grupo": "B"}, {"id": 108, "nombre": "González Grajales Andrea", "grado": "3°", "grupo": "B"}, {"id": 109, "nombre": "Islas Tenorio Ana Lucía", "grado": "3°", "grupo": "B"}, {"id": 110, "nombre": "Lezama González Sebastián Mikel", "grado": "3°", "grupo": "B"}, {"id": 111, "nombre": "Morodo Compañ Camila", "grado": "3°", "grupo": "B"}, {"id": 112, "nombre": "Ojeda Cánovas Bernardo", "grado": "3°", "grupo": "B"}, {"id": 113, "nombre": "Otero Beristain Alexa", "grado": "3°", "grupo": "B"}, {"id": 114, "nombre": "Ramírez Ávila Cristina Inés", "grado": "3°", "grupo": "B"}, {"id": 115, "nombre": "Rosas Friederichsen Santiago", "grado": "3°", "grupo": "B"}, {"id": 116, "nombre": "Solana Rodriguez Juan José", "grado": "3°", "grupo": "B"}, {"id": 117, "nombre": "Ventura Rivero Isabel", "grado": "3°", "grupo": "B"}, {"id": 118, "nombre": "Villar Castellanos Daniela", "grado": "3°", "grupo": "B"}, {"id": 119, "nombre": "Bretón Schumacher Piero", "grado": "4°", "grupo": "A"}, {"id": 120, "nombre": "Anaya Zairick Regina", "grado": "4°", "grupo": "A"}, {"id": 121, "nombre": "Arena Albrecht Regina", "grado": "4°", "grupo": "A"}, {"id": 122, "nombre": "Barradas Utrera Jorge Miguel", "grado": "4°", "grupo": "A"}, {"id": 123, "nombre": "Benitez Rangel Mateo", "grado": "4°", "grupo": "A"}, {"id": 124, "nombre": "Carvajal Juárez Alexa", "grado": "4°", "grupo": "A"}, {"id": 125, "nombre": "Del Castillo Álvarez del Castillo Maite", "grado": "4°", "grupo": "A"}, {"id": 126, "nombre": "Dominici Torres Carlo Alessandro", "grado": "4°", "grupo": "A"}, {"id": 127, "nombre": "Espina Zairick Juan Pedro", "grado": "4°", "grupo": "A"}, {"id": 128, "nombre": "Fernández González Lucas", "grado": "4°", "grupo": "A"}, {"id": 129, "nombre": "Gutiérrez Arena Gabriel", "grado": "4°", "grupo": "A"}, {"id": 130, "nombre": "Jean Ramirez Eduardo", "grado": "4°", "grupo": "A"}, {"id": 131, "nombre": "Lizcano Souza Luis Esteban", "grado": "4°", "grupo": "A"}, {"id": 132, "nombre": "Mijangos Victoria Lya", "grado": "4°", "grupo": "A"}, {"id": 133, "nombre": "Molina Lugo Karol Elizabeth", "grado": "4°", "grupo": "A"}, {"id": 134, "nombre": "Ponce Vázquez María Paula", "grado": "4°", "grupo": "A"}, {"id": 135, "nombre": "Reisinger Pacheco Dina Sofia", "grado": "4°", "grupo": "A"}, {"id": 136, "nombre": "Rojas López María Inés", "grado": "4°", "grupo": "A"}, {"id": 137, "nombre": "Sánchez Acuña Juliana", "grado": "4°", "grupo": "A"}, {"id": 138, "nombre": "Tamayo Calderón Ana Paula", "grado": "4°", "grupo": "A"}, {"id": 139, "nombre": "Barbieri Rodríguez Matteo", "grado": "4°", "grupo": "B"}, {"id": 140, "nombre": "Borja Rosas Fernando", "grado": "4°", "grupo": "B"}, {"id": 141, "nombre": "Centeno Espina Benjamín", "grado": "4°", "grupo": "B"}, {"id": 142, "nombre": "González Vásquez Luciana Guadalupe", "grado": "4°", "grupo": "B"}, {"id": 143, "nombre": "Jiménez Figueroa Lucía", "grado": "4°", "grupo": "B"}, {"id": 144, "nombre": "Jiménez Mendoza Pablo", "grado": "4°", "grupo": "B"}, {"id": 145, "nombre": "Martínez Corzas Daniel", "grado": "4°", "grupo": "B"}, {"id": 146, "nombre": "Mimica Popic Mila", "grado": "4°", "grupo": "B"}, {"id": 147, "nombre": "Pacheco Ventosa Emiliano", "grado": "4°", "grupo": "B"}, {"id": 148, "nombre": "Parra Rojas Regina", "grado": "4°", "grupo": "B"}, {"id": 149, "nombre": "Perea Marcos Matías", "grado": "4°", "grupo": "B"}, {"id": 150, "nombre": "Pimentel Pérez Ana Paula", "grado": "4°", "grupo": "B"}, {"id": 151, "nombre": "Rodríguez Saldaña Lucía", "grado": "4°", "grupo": "B"}, {"id": 152, "nombre": "Rojas Benítez Daniela", "grado": "4°", "grupo": "B"}, {"id": 153, "nombre": "Sánchez Rábago Victoria", "grado": "4°", "grupo": "B"}, {"id": 154, "nombre": "Santiago Silva Camila", "grado": "4°", "grupo": "B"}, {"id": 155, "nombre": "Trejo Zapien Bárbara", "grado": "4°", "grupo": "B"}, {"id": 156, "nombre": "Trueba Arena Pedro", "grado": "4°", "grupo": "B"}, {"id": 157, "nombre": "Vega Ibarra Matías", "grado": "4°", "grupo": "B"}, {"id": 158, "nombre": "Benitez Rangel Ana", "grado": "5°", "grupo": "A"}, {"id": 159, "nombre": "Córdova León María Constanza", "grado": "5°", "grupo": "A"}, {"id": 160, "nombre": "Diaz Rodríguez Ana Victoria", "grado": "5°", "grupo": "A"}, {"id": 161, "nombre": "Franco Flores Carlos", "grado": "5°", "grupo": "A"}, {"id": 162, "nombre": "García Becerra Luis Enrique", "grado": "5°", "grupo": "A"}, {"id": 163, "nombre": "García Zarate Luciana", "grado": "5°", "grupo": "A"}, {"id": 164, "nombre": "González De Unanue José Octavio", "grado": "5°", "grupo": "A"}, {"id": 165, "nombre": "Gutiérrez Arena Isabel", "grado": "5°", "grupo": "A"}, {"id": 166, "nombre": "Hochstrasser Olvera Emma", "grado": "5°", "grupo": "A"}, {"id": 167, "nombre": "Howe Rábago Ana", "grado": "5°", "grupo": "A"}, {"id": 168, "nombre": "Ortiz Peña José Nicolás", "grado": "5°", "grupo": "A"}, {"id": 169, "nombre": "Rivera Ávila Pablo Alberto", "grado": "5°", "grupo": "A"}, {"id": 170, "nombre": "Solana Rodríguez María Guadalupe", "grado": "5°", "grupo": "A"}, {"id": 171, "nombre": "Taja León Dalel", "grado": "5°", "grupo": "A"}, {"id": 172, "nombre": "Trejo Zapien Juan David", "grado": "5°", "grupo": "A"}, {"id": 173, "nombre": "Zabalza Cabrera Aitana", "grado": "5°", "grupo": "A"}, {"id": 174, "nombre": "Zabalza Cabrera Irune", "grado": "5°", "grupo": "A"}, {"id": 175, "nombre": "Arena Ortiz Alonso", "grado": "5°", "grupo": "B"}, {"id": 176, "nombre": "Cariño García Fátima", "grado": "5°", "grupo": "B"}, {"id": 177, "nombre": "Casas Soto Paulina", "grado": "5°", "grupo": "B"}, {"id": 178, "nombre": "Cerda Sánchez Romina", "grado": "5°", "grupo": "B"}, {"id": 179, "nombre": "Flores González Isabella", "grado": "5°", "grupo": "B"}, {"id": 180, "nombre": "Hernández Sepúlveda Pablo Emmanuel", "grado": "5°", "grupo": "B"}, {"id": 181, "nombre": "Molina Lugo Leonardo Mateo", "grado": "5°", "grupo": "B"}, {"id": 182, "nombre": "Noriega Piza Martina", "grado": "5°", "grupo": "B"}, {"id": 183, "nombre": "Ponce de León Carranco Fátima", "grado": "5°", "grupo": "B"}, {"id": 184, "nombre": "Sánchez Fernández María", "grado": "5°", "grupo": "B"}, {"id": 185, "nombre": "Sepúlveda Romero Eduardo", "grado": "5°", "grupo": "B"}, {"id": 186, "nombre": "Solana Zavala Victoria", "grado": "5°", "grupo": "B"}, {"id": 187, "nombre": "Tepox Maldonado Luis Eduardo", "grado": "5°", "grupo": "B"}, {"id": 188, "nombre": "Uribe Rodríguez Regina", "grado": "5°", "grupo": "B"}, {"id": 189, "nombre": "Vargas González Raul", "grado": "5°", "grupo": "B"}, {"id": 190, "nombre": "Ventura Rivero Alexa", "grado": "5°", "grupo": "B"}, {"id": 191, "nombre": "Zamorano Mena Regina", "grado": "5°", "grupo": "B"}, {"id": 192, "nombre": "Acosta Martínez Humberto", "grado": "6°", "grupo": null}, {"id": 193, "nombre": "Aguirre Torres Estefanía", "grado": "6°", "grupo": null}, {"id": 194, "nombre": "Alatorre Leyva Julia", "grado": "6°", "grupo": null}, {"id": 195, "nombre": "Álvarez Montes Valentino", "grado": "6°", "grupo": null}, {"id": 196, "nombre": "Arriaga Cantú Leonardo", "grado": "6°", "grupo": null}, {"id": 197, "nombre": "Benitez Rangel Pablo", "grado": "6°", "grupo": null}, {"id": 198, "nombre": "Bretón Schumacher Elena", "grado": "6°", "grupo": null}, {"id": 199, "nombre": "Castillo Morales Ximena", "grado": "6°", "grupo": null}, {"id": 200, "nombre": "Centeno Espina José Pablo", "grado": "6°", "grupo": null}, {"id": 201, "nombre": "Chávez López Luisa", "grado": "6°", "grupo": null}, {"id": 202, "nombre": "Del Castillo Álvarez del Castillo Ander", "grado": "6°", "grupo": null}, {"id": 203, "nombre": "Gallego Castilla María José", "grado": "6°", "grupo": null}, {"id": 204, "nombre": "Gándara Guerrero Mariel", "grado": "6°", "grupo": null}, {"id": 205, "nombre": "González Vázquez Marga", "grado": "6°", "grupo": null}, {"id": 206, "nombre": "González Venta Isabela", "grado": "6°", "grupo": null}, {"id": 207, "nombre": "Howe Bernardi Regina", "grado": "6°", "grupo": null}, {"id": 208, "nombre": "Jiménez Guillermo Prieto Fátima", "grado": "6°", "grupo": null}, {"id": 209, "nombre": "Larracilla Pérez María José", "grado": "6°", "grupo": null}, {"id": 210, "nombre": "Lezama González Marco André", "grado": "6°", "grupo": null}, {"id": 211, "nombre": "Martínez Corzas Aislinn", "grado": "6°", "grupo": null}, {"id": 212, "nombre": "Perea Marcos María", "grado": "6°", "grupo": null}, {"id": 213, "nombre": "Prado Rodall Patricio", "grado": "6°", "grupo": null}, {"id": 214, "nombre": "Quintana Sampieri Jimena", "grado": "6°", "grupo": null}, {"id": 215, "nombre": "Rivera Salinas Martina", "grado": "6°", "grupo": null}, {"id": 216, "nombre": "Rosano Cabrera Valentina", "grado": "6°", "grupo": null}, {"id": 217, "nombre": "Sánchez Jimenez María", "grado": "6°", "grupo": null}, {"id": 218, "nombre": "Villar Castellanos Natalia", "grado": "6°", "grupo": null}, {"id": 219, "nombre": "Zafra Vázquez Renata", "grado": "6°", "grupo": null}, {"id": 220, "nombre": "Aranda Baños Ana Lucía", "grado": "7°", "grupo": "A"}, {"id": 221, "nombre": "Barrios Pohlenz Ana Sofia", "grado": "7°", "grupo": "A"}, {"id": 222, "nombre": "Benitez Rangel Diego", "grado": "7°", "grupo": "A"}, {"id": 223, "nombre": "Boxer Eguiarte André", "grado": "7°", "grupo": "A"}, {"id": 224, "nombre": "Bretón Schumacher Luca", "grado": "7°", "grupo": "A"}, {"id": 225, "nombre": "Casas Soto Andrea", "grado": "7°", "grupo": "A"}, {"id": 226, "nombre": "Castro Chong Ximena", "grado": "7°", "grupo": "A"}, {"id": 227, "nombre": "Díaz Carrillo Ana Paola", "grado": "7°", "grupo": "A"}, {"id": 228, "nombre": "Escalona Martínez Lía", "grado": "7°", "grupo": "A"}, {"id": 229, "nombre": "Espinosa Hernández José Ramón", "grado": "7°", "grupo": "A"}, {"id": 230, "nombre": "Garmendia Rivera María", "grado": "7°", "grupo": "A"}, {"id": 231, "nombre": "Gutiérrez Arena Gerardo", "grado": "7°", "grupo": "A"}, {"id": 232, "nombre": "Mijangos Victoria Ian", "grado": "7°", "grupo": "A"}, {"id": 233, "nombre": "Mimica Popic Ivana", "grado": "7°", "grupo": "A"}, {"id": 234, "nombre": "Minutti Gómez Ana", "grado": "7°", "grupo": "A"}, {"id": 235, "nombre": "Porta Lopez Senties Eugenia", "grado": "7°", "grupo": "A"}, {"id": 236, "nombre": "Rosete Rodriguez Fátima", "grado": "7°", "grupo": "A"}, {"id": 237, "nombre": "Vargas González Leonardo", "grado": "7°", "grupo": "A"}, {"id": 238, "nombre": "Ayala Molina Natalia", "grado": "7°", "grupo": "B"}, {"id": 239, "nombre": "Bordás Solana Teodoro", "grado": "7°", "grupo": "B"}, {"id": 240, "nombre": "Celma Sánchez Santiago", "grado": "7°", "grupo": "B"}, {"id": 241, "nombre": "Chávez López Darío", "grado": "7°", "grupo": "B"}, {"id": 242, "nombre": "Cisneros Sánchez Aranza", "grado": "7°", "grupo": "B"}, {"id": 243, "nombre": "Corona Couttolenc Emiliano", "grado": "7°", "grupo": "B"}, {"id": 244, "nombre": "Curiel Benítez Sara", "grado": "7°", "grupo": "B"}, {"id": 245, "nombre": "Díaz Martínez Luciana", "grado": "7°", "grupo": "B"}, {"id": 246, "nombre": "Domínguez Duarte José Alfonso", "grado": "7°", "grupo": "B"}, {"id": 247, "nombre": "Escalona Martínez Christopher", "grado": "7°", "grupo": "B"}, {"id": 248, "nombre": "Fogel Cardoso Lorenza", "grado": "7°", "grupo": "B"}, {"id": 249, "nombre": "González Muciño Mía", "grado": "7°", "grupo": "B"}, {"id": 250, "nombre": "Howe Rábago Lucía", "grado": "7°", "grupo": "B"}, {"id": 251, "nombre": "Jiménez Torres Ximena", "grado": "7°", "grupo": "B"}, {"id": 252, "nombre": "Martínez Santana Mía Renata", "grado": "7°", "grupo": "B"}, {"id": 253, "nombre": "Reisinger Pacheco Alejandra", "grado": "7°", "grupo": "B"}, {"id": 254, "nombre": "Rodríguez Chávez Regina", "grado": "7°", "grupo": "B"}, {"id": 255, "nombre": "Rojas López Luis Andrés", "grado": "7°", "grupo": "B"}, {"id": 256, "nombre": "Tamayo Calderón María José", "grado": "7°", "grupo": "B"}, {"id": 257, "nombre": "Aguirre Torres Juan Carlos", "grado": "8°", "grupo": null}, {"id": 258, "nombre": "Arena Ortíz Julia", "grado": "8°", "grupo": null}, {"id": 259, "nombre": "Arriaga Cantú Julieta", "grado": "8°", "grupo": null}, {"id": 260, "nombre": "Barcena Maldonado Ana Sofía", "grado": "8°", "grupo": null}, {"id": 261, "nombre": "Barcena Maldonado Santiago", "grado": "8°", "grupo": null}, {"id": 262, "nombre": "Bravo Juárez Luis Rodrigo", "grado": "8°", "grupo": null}, {"id": 263, "nombre": "Celma Sánchez Renata", "grado": "8°", "grupo": null}, {"id": 264, "nombre": "Contreras Espinoza Ximena", "grado": "8°", "grupo": null}, {"id": 265, "nombre": "De la Peña Diez de Urdanivia Antonio", "grado": "8°", "grupo": null}, {"id": 266, "nombre": "Del Castillo Álvarez del Castillo Mikel", "grado": "8°", "grupo": null}, {"id": 267, "nombre": "Díaz Martínez José Ramón", "grado": "8°", "grupo": null}, {"id": 268, "nombre": "Escoto Ortíz Constanza", "grado": "8°", "grupo": null}, {"id": 269, "nombre": "Fernández González Isabel", "grado": "8°", "grupo": null}, {"id": 270, "nombre": "Franco Rosete Carmina", "grado": "8°", "grupo": null}, {"id": 271, "nombre": "Gallego Castilla Fernando", "grado": "8°", "grupo": null}, {"id": 272, "nombre": "Gan Gutiérrez María José", "grado": "8°", "grupo": null}, {"id": 273, "nombre": "González Allier Daniela", "grado": "8°", "grupo": null}, {"id": 274, "nombre": "González Vázquez María José", "grado": "8°", "grupo": null}, {"id": 275, "nombre": "Hernández Díaz Fernando Matías", "grado": "8°", "grupo": null}, {"id": 276, "nombre": "Palacios Escalona Alafin Emiliano", "grado": "8°", "grupo": null}, {"id": 277, "nombre": "Plata Diez de Urdanivia Triana", "grado": "8°", "grupo": null}, {"id": 278, "nombre": "Solana Rosas Freda Matías", "grado": "8°", "grupo": null}, {"id": 279, "nombre": "Ventosa Irusteta Alejandro", "grado": "8°", "grupo": null}, {"id": 280, "nombre": "Zamorano Mena Elisa", "grado": "8°", "grupo": null}, {"id": 281, "nombre": "Álvarez Montes Marcelino", "grado": "9°", "grupo": "A"}, {"id": 282, "nombre": "Aranda Baños Juan Pablo", "grado": "9°", "grupo": "A"}, {"id": 283, "nombre": "Arena Gerala Begoña", "grado": "9°", "grupo": "A"}, {"id": 284, "nombre": "Carrera Quirós Ricardo", "grado": "9°", "grupo": "A"}, {"id": 285, "nombre": "De Ita De la Fuente Eugenia", "grado": "9°", "grupo": "A"}, {"id": 286, "nombre": "De Mendizabal Pérez Constanza", "grado": "9°", "grupo": "A"}, {"id": 287, "nombre": "Espadas Barajas Isabella", "grado": "9°", "grupo": "A"}, {"id": 288, "nombre": "Grajales Ramírez Daniela María", "grado": "9°", "grupo": "A"}, {"id": 289, "nombre": "Mijangos Victoria Isabella", "grado": "9°", "grupo": "A"}, {"id": 290, "nombre": "Ortega Martínez Valentina", "grado": "9°", "grupo": "A"}, {"id": 291, "nombre": "Pacheco Ventosa Gabriela", "grado": "9°", "grupo": "A"}, {"id": 292, "nombre": "Porta López Sentíes Constanza", "grado": "9°", "grupo": "A"}, {"id": 293, "nombre": "Ramírez Ávila Víctor Andrés", "grado": "9°", "grupo": "A"}, {"id": 294, "nombre": "Rodríguez Haghenbeck Aitana", "grado": "9°", "grupo": "A"}, {"id": 295, "nombre": "Soto Rojas Iker", "grado": "9°", "grupo": "A"}, {"id": 296, "nombre": "Zamora Trejo Regina", "grado": "9°", "grupo": "A"}, {"id": 297, "nombre": "Álvarez de Unanue Begoña", "grado": "9°", "grupo": "B"}, {"id": 298, "nombre": "Arcos Hernández Ximena", "grado": "9°", "grupo": "B"}, {"id": 299, "nombre": "Arena Ortíz Fátima", "grado": "9°", "grupo": "B"}, {"id": 300, "nombre": "Arena Villarreal Iker", "grado": "9°", "grupo": "B"}, {"id": 301, "nombre": "Centeno Espina Raquel", "grado": "9°", "grupo": "B"}, {"id": 302, "nombre": "Corona Couttolenc Sebastián", "grado": "9°", "grupo": "B"}, {"id": 303, "nombre": "Fernández González Diego", "grado": "9°", "grupo": "B"}, {"id": 304, "nombre": "Fitzmaurice Munguía Julia", "grado": "9°", "grupo": "B"}, {"id": 305, "nombre": "Jean Ramírez Ana Sofía", "grado": "9°", "grupo": "B"}, {"id": 306, "nombre": "Leyva Ponce de León Adolfo", "grado": "9°", "grupo": "B"}, {"id": 307, "nombre": "Martínez Santana Ana Victoria", "grado": "9°", "grupo": "B"}, {"id": 308, "nombre": "Meneses Solana Alejandro", "grado": "9°", "grupo": "B"}, {"id": 309, "nombre": "Portilla Bilbao Constanza", "grado": "9°", "grupo": "B"}, {"id": 310, "nombre": "Priede Vázquez Iñaki", "grado": "9°", "grupo": "B"}, {"id": 311, "nombre": "Rivera Ávila José Carlos", "grado": "9°", "grupo": "B"}, {"id": 312, "nombre": "Rodríguez Acuña Maika", "grado": "9°", "grupo": "B"}, {"id": 313, "nombre": "Sánchez Melo Santiago", "grado": "9°", "grupo": "B"}, {"id": 314, "nombre": "Acosta del Rosal Jimena", "grado": "10°", "grupo": null}, {"id": 315, "nombre": "Acosta Martínez Valeria", "grado": "10°", "grupo": null}, {"id": 316, "nombre": "Campos von Raesfeld María del Pilar", "grado": "10°", "grupo": null}, {"id": 317, "nombre": "De la Peña Diez de Urdanivia Paula", "grado": "10°", "grupo": null}, {"id": 318, "nombre": "Fernández del Campo Villarreal Paola Angelica", "grado": "10°", "grupo": null}, {"id": 319, "nombre": "González Vásquez José Daniel", "grado": "10°", "grupo": null}, {"id": 320, "nombre": "Hernández Rivera Ana Cristina", "grado": "10°", "grupo": null}, {"id": 321, "nombre": "Hidalgo López Malo Regina", "grado": "10°", "grupo": null}, {"id": 322, "nombre": "Howe Bernardi Rossella", "grado": "10°", "grupo": null}, {"id": 323, "nombre": "Ibarra Flores Naila", "grado": "10°", "grupo": null}, {"id": 324, "nombre": "Lizcano Souza Sebastián Noel", "grado": "10°", "grupo": null}, {"id": 325, "nombre": "Merino Castillo Mila", "grado": "10°", "grupo": null}, {"id": 326, "nombre": "Noriega Piza Mathías", "grado": "10°", "grupo": null}, {"id": 327, "nombre": "Pérez Mondragón Renata", "grado": "10°", "grupo": null}, {"id": 328, "nombre": "Quintana Sampieri Paula", "grado": "10°", "grupo": null}, {"id": 329, "nombre": "Afsharjahanshahi Viana", "grado": "11°", "grupo": null}, {"id": 330, "nombre": "Alatorre Leyva Pamela", "grado": "11°", "grupo": null}, {"id": 331, "nombre": "Camarena Figueroa María Paula", "grado": "11°", "grupo": null}, {"id": 332, "nombre": "Nicolau Mendiburu Jerónimo", "grado": "11°", "grupo": null}, {"id": 333, "nombre": "Pacheco Ventosa José Luis", "grado": "11°", "grupo": null}, {"id": 334, "nombre": "Solana Zavala Juan María", "grado": "11°", "grupo": null}, {"id": 335, "nombre": "Stefanoni Piloni Daniela", "grado": "11°", "grupo": null}, {"id": 336, "nombre": "Bárcena Maldonado María Elena", "grado": "12°", "grupo": null}, {"id": 337, "nombre": "Carrera Quirós Catalina", "grado": "12°", "grupo": null}, {"id": 338, "nombre": "Darwich Gómez Zara", "grado": "12°", "grupo": null}, {"id": 339, "nombre": "Fresnedo Alonso Mariana", "grado": "12°", "grupo": null}, {"id": 340, "nombre": "García Herrera Carmina", "grado": "12°", "grupo": null}, {"id": 341, "nombre": "González Vásquez Lorena María de Lourdes", "grado": "12°", "grupo": null}, {"id": 342, "nombre": "Leyva Ponce de León Isabella", "grado": "12°", "grupo": null}, {"id": 343, "nombre": "Loredo Castro Guillermina", "grado": "12°", "grupo": null}, {"id": 344, "nombre": "Méndez Avilés Sophie", "grado": "12°", "grupo": null}, {"id": 345, "nombre": "Millán García Teruel Narda", "grado": "12°", "grupo": null}, {"id": 346, "nombre": "Mones Llaca Aldonza", "grado": "12°", "grupo": null}, {"id": 347, "nombre": "Ponce de León Carranco Karen", "grado": "12°", "grupo": null}, {"id": 348, "nombre": "Rocha Taja Alexa", "grado": "12°", "grupo": null}, {"id": 349, "nombre": "Rodríguez Urrutia Begoña", "grado": "12°", "grupo": null}, {"id": 350, "nombre": "Rugarcía Paz María", "grado": "12°", "grupo": null}, {"id": 351, "nombre": "Villarruel Servín Verónica", "grado": "12°", "grupo": null}, {"id": 352, "nombre": "Youshimats Alduncín José Luis", "grado": "12°", "grupo": null}];
-const TEACHERS = [{"id": 1, "nombre": "Aldo Pérez", "secciones": "Primaria Baja", "materias": "INGLÉS", "grupos": [{"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 2, "nombre": "Alejandra Cerón", "secciones": "Primaria Alta", "materias": "INGLÉS", "grupos": [{"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}]}, {"id": 3, "nombre": "Alejandro Gallardo", "secciones": "Primaria Alta, Secundaria", "materias": "ED. ARTÍSTICA, Talleres: Ajedrez / Arte / Teatro", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 4, "nombre": "Alexis Montes", "secciones": "Primaria Alta, Primaria Baja", "materias": "APRENDER A SER PERSONA, MUNDO Y SOCIEDAD", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 5, "nombre": "Ana Daniela Vásquez", "secciones": "Primaria Alta, Primaria Baja", "materias": "ED. SOCIOEMOCIONAL, FORMACIÓN RELIGIOSA", "grupos": [{"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 6, "nombre": "Ana María Muñoz", "secciones": "Prepa, Secundaria", "materias": "Gastronomía", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 7, "nombre": "Andrea Berkefeld", "secciones": "Prepa, Secundaria", "materias": "Alemán, Business GAC012, Ciencias Sociales, Entorno Económico, International Business GAC022, Proyectos con Causa GAC031, Seminario 1", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 8, "nombre": "Annel Cecilia Pulido", "secciones": "Primaria Alta, Primaria Baja, Secundaria", "materias": "ED. ARTÍSTICA, ESPAÑOL, MUNDO Y SOCIEDAD, Talleres: Ajedrez / Arte / Teatro", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 9, "nombre": "Bernardo Niaves", "secciones": "Secundaria", "materias": "Aprender a Ser Persona, Formación Religiosa", "grupos": [{"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 10, "nombre": "Carmen María Celma", "secciones": "Secundaria", "materias": "Aprender a Ser Persona", "grupos": [{"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 11, "nombre": "Carolina Báez", "secciones": "Primaria Alta", "materias": "INGLÉS", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}]}, {"id": 12, "nombre": "Carolina Linares", "secciones": "Primaria Baja", "materias": "MATEMÁTICAS", "grupos": [{"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 13, "nombre": "Cristina Celma", "secciones": "Prepa, Primaria Alta, Secundaria", "materias": "ED. SOCIOEMOCIONAL, Lectura y Redacción, Literatura, Pensamiento Crítico, Seminario 1", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 14, "nombre": "Emmanuel Ramírez", "secciones": "Primaria Alta", "materias": "ESPAÑOL", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}]}, {"id": 15, "nombre": "Fátima Muñoz", "secciones": "Primaria Alta, Primaria Baja, Secundaria", "materias": "ED. ARTÍSTICA, Talleres: Ajedrez / Arte / Teatro", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 16, "nombre": "Gabriela Gutiérrez", "secciones": "Primaria Alta, Primaria Baja", "materias": "DIY/BOY'S PROJECT", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 17, "nombre": "Gabriela Morales Díaz", "secciones": "Prepa, Primaria Alta, Primaria Baja, Secundaria", "materias": "EDUCACIÓN FÍSICA — BLOQUE INSTITUCIONAL, NEURO", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 18, "nombre": "Guadalupe Méndez", "secciones": "Prepa, Secundaria", "materias": "Física, Matemáticas GAC004, Tecnología", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}]}, {"id": 19, "nombre": "Itzel Abarca", "secciones": "Primaria Alta, Primaria Baja, Secundaria", "materias": "TI", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 20, "nombre": "Jeremy McDonald", "secciones": "Prepa, Secundaria", "materias": "Communication Skills GAC006, Inglés, Reading & Writing GAC015", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 21, "nombre": "Leví Morán", "secciones": "Primaria Alta", "materias": "ESPAÑOL, MATEMÁTICAS", "grupos": [{"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}]}, {"id": 22, "nombre": "Luis Batista", "secciones": "Prepa", "materias": "Antropología, Filosofía, Teología, Ética y Estética", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}]}, {"id": 23, "nombre": "Manuel Palacios Márquez", "secciones": "Prepa, Primaria Alta, Primaria Baja, Secundaria", "materias": "EDUCACIÓN FÍSICA — BLOQUE INSTITUCIONAL, NEURO", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 24, "nombre": "Mariana Islas", "secciones": "Prepa", "materias": "Cambridge / ACT, Listening & Speaking 007, Listening & Speaking GAC001, Listening & Speaking GAC014, Study Skills GAC003", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}]}, {"id": 25, "nombre": "María Elena Moreno", "secciones": "Primaria Alta, Primaria Baja", "materias": "APRENDER A SER PERSONA, FORMACIÓN RELIGIOSA", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 26, "nombre": "María Elena Saldaña", "secciones": "Prepa, Secundaria", "materias": "Geografía, Historia I, Inglés, Reading & Writing GAC002, Reading & Writing GAC008", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}]}, {"id": 27, "nombre": "María Vantolra", "secciones": "Prepa", "materias": "Orientación Vocacional GAC032, Psicología", "grupos": [{"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}]}, {"id": 28, "nombre": "Misael Carrasco", "secciones": "Prepa, Secundaria", "materias": "Computing I GAC005, Historia de México II, Inglés, Research Skills GAC028", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 29, "nombre": "Moira Suárez", "secciones": "Prepa", "materias": "Cálculo GAC016, Lógica, Matemáticas GAC004, Seminario 1", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}]}, {"id": 30, "nombre": "Montse Uribe", "secciones": "Primaria Baja", "materias": "INGLÉS", "grupos": [{"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 31, "nombre": "Paola Piza", "secciones": "Primaria Alta, Primaria Baja", "materias": "MATEMÁTICAS", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 32, "nombre": "Paola Sánchez", "secciones": "Secundaria", "materias": "Español", "grupos": [{"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 33, "nombre": "Patricia García", "secciones": "Primaria Baja", "materias": "ESPAÑOL", "grupos": [{"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 34, "nombre": "Patricio Cacho", "secciones": "Primaria Alta, Primaria Baja, Secundaria", "materias": "DIY/BOY'S PROJECT, ED. ARTÍSTICA, Gastronomía", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 35, "nombre": "Rafael Gómez Lugo", "secciones": "Prepa, Primaria Alta, Primaria Baja, Secundaria", "materias": "EDUCACIÓN FÍSICA — BLOQUE INSTITUCIONAL, NEURO", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 36, "nombre": "Regina Violante", "secciones": "Primaria Baja", "materias": "INGLÉS", "grupos": [{"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 37, "nombre": "Rocío García", "secciones": "Primaria Alta, Primaria Baja", "materias": "FORMACIÓN RELIGIOSA", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}]}, {"id": 38, "nombre": "Rosa María Grajales", "secciones": "Prepa", "materias": "Seminario de Empresariales 2", "grupos": [{"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}]}, {"id": 39, "nombre": "Roxana López", "secciones": "Prepa, Secundaria", "materias": "Matemáticas, Probabilidad y Estadística", "grupos": [{"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 40, "nombre": "Salomón Carmona", "secciones": "Primaria Alta", "materias": "INGLÉS", "grupos": [{"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}]}, {"id": 41, "nombre": "Sharon Guzmán", "secciones": "Prepa, Secundaria", "materias": "Biología, General Science GAC023, Química, Scientific Principles GAC013", "grupos": [{"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}, {"id": 42, "nombre": "Susana Melchor Vázquez", "secciones": "Prepa, Primaria Alta, Primaria Baja, Secundaria", "materias": "EDUCACIÓN FÍSICA — BLOQUE INSTITUCIONAL", "grupos": [{"codigo": "PA 4A", "grado": "4°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 4B", "grado": "4°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 5A", "grado": "5°", "grupo": "A", "seccion": "Primaria Alta"}, {"codigo": "PA 5B", "grado": "5°", "grupo": "B", "seccion": "Primaria Alta"}, {"codigo": "PA 6A", "grado": "6°", "grupo": null, "seccion": "Primaria Alta"}, {"codigo": "PB 1A", "grado": "1°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 1B", "grado": "1°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 2A", "grado": "2°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 2B", "grado": "2°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PB 3A", "grado": "3°", "grupo": "A", "seccion": "Primaria Baja"}, {"codigo": "PB 3B", "grado": "3°", "grupo": "B", "seccion": "Primaria Baja"}, {"codigo": "PREPA 10", "grado": "10°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 11", "grado": "11°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "PREPA 12", "grado": "12°", "grupo": null, "seccion": "Preparatoria"}, {"codigo": "SEC 7A", "grado": "7°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 7B", "grado": "7°", "grupo": "B", "seccion": "Secundaria"}, {"codigo": "SEC 8", "grado": "8°", "grupo": null, "seccion": "Secundaria"}, {"codigo": "SEC 9A", "grado": "9°", "grupo": "A", "seccion": "Secundaria"}, {"codigo": "SEC 9B", "grado": "9°", "grupo": "B", "seccion": "Secundaria"}]}];
+/* ---------- CONFIG: conexión a Google Sheets (Apps Script Web App) ---------- */
+const API_URL = "https://script.google.com/macros/s/AKfycbx8RBtLEYgugGPW_-WZepZmnhYawOlKbe4wzmfc83rLNBq8Amwa8HgVPd3m6ki2gCTa/exec"; // termina en /exec
 
+/* Reutiliza el logo ya incrustado en la pantalla de login para el PDF de incidencias */
+const LOGO_BASE64 = document.querySelector('.login-logo').src;
+
+/* ---------- DATA: se cargan desde el Google Sheet al iniciar (fetchAllData) ---------- */
+let STUDENTS = [];
+let TEACHERS = [];
 const GRADE_ORDER = ['1°','2°','3°','4°','5°','6°','7°','8°','9°','10°','11°','12°'];
-const CATEGORIAS = {
-  "Clan": ["Falta a los valores del Clan","Bajo compromiso con actividades del Clan","Conflicto entre integrantes del mismo Clan","Conflicto entre Clanes","Actitud negativa en dinámicas o competencias","Otro"],
-  "Normativa": ["Incumplimiento del uniforme","Uso inadecuado de dispositivos electrónicos","Impuntualidad","Inasistencia sin justificar","Material o alimentos no permitidos","Incumplimiento de tareas o materiales","Salida del salón/plantel sin autorización","Otro"],
-  "Disciplinaria": ["Violencia Verbal","Violencia Social","Violencia Patrimonial","Violencia Física","Violencia Psicológica","Violencia Sexual","Otro"],
-  "Mediación": ["Conflicto entre compañeros","Conflicto alumno-maestro","Conflicto grupal","Seguimiento a acuerdo previo","Solicitud de mediación por un padre de familia","Otro"]
+// Mapeo grado -> sección, igual que los prefijos PB/PA/SEC/PREPA de Dim_Docente_Grupo
+const GRADO_SECCION = {
+  '1°':'Primaria Baja','2°':'Primaria Baja','3°':'Primaria Baja',
+  '4°':'Primaria Alta','5°':'Primaria Alta','6°':'Primaria Alta',
+  '7°':'Secundaria','8°':'Secundaria','9°':'Secundaria',
+  '10°':'Preparatoria','11°':'Preparatoria','12°':'Preparatoria'
 };
-const CATEGORIA_LIST = Object.keys(CATEGORIAS);
+let CATEGORIAS = {};
+let CATEGORIA_LIST = [];
+
+// Catálogos que se mantienen fijos en el código (coinciden 1:1 con Dim_Lugares,
+// Dim_Gravedad y Dim_Estados del Sheet). Si agregas/quitas valores en esas hojas,
+// actualiza también estas listas para que los id sigan coincidiendo.
+const LUGARES = [
+  {lugar_id:1, nombre:"Salón de clases"}, {lugar_id:2, nombre:"Patio / Recreo"},
+  {lugar_id:3, nombre:"Comedor"}, {lugar_id:4, nombre:"Pasillos"},
+  {lugar_id:5, nombre:"Educación física / Deportes"}, {lugar_id:6, nombre:"Transporte escolar"},
+  {lugar_id:7, nombre:"Excursión / Salida"}, {lugar_id:8, nombre:"Otro"}
+];
+const GRAVEDADES = [{gravedad_id:1, nombre:"Leve"}, {gravedad_id:2, nombre:"Moderada"}, {gravedad_id:3, nombre:"Grave"}];
+const ESTADOS_CAT = [{estado_id:1, nombre:"Abierta"}, {estado_id:2, nombre:"En seguimiento"}, {estado_id:3, nombre:"Cerrada"}];
+
+// Mapas id <-> nombre, para traducir entre lo que guarda el Sheet (ids) y lo que
+// usa la interfaz (texto). Se llenan en fetchAllData().
+let MAP = {
+  lugarByNombre: Object.fromEntries(LUGARES.map(l=>[l.nombre, l.lugar_id])),
+  lugarById: Object.fromEntries(LUGARES.map(l=>[l.lugar_id, l.nombre])),
+  gravedadByNombre: Object.fromEntries(GRAVEDADES.map(g=>[g.nombre, g.gravedad_id])),
+  gravedadById: Object.fromEntries(GRAVEDADES.map(g=>[g.gravedad_id, g.nombre])),
+  estadoByNombre: Object.fromEntries(ESTADOS_CAT.map(e=>[e.nombre, e.estado_id])),
+  estadoById: Object.fromEntries(ESTADOS_CAT.map(e=>[e.estado_id, e.nombre])),
+  categoriaByNombre: {}, categoriaById: {},
+  subcategoriaByNombre: {}, subcategoriaById: {}, subcategoriaCategoriaId: {},
+  alumnoById: {}, docenteById: {}, docenteByNombre: {}
+};
+
+/* ---------- Carga inicial: trae todas las tablas del Google Sheet ---------- */
+async function fetchAllData(){
+  const res = await fetch(`${API_URL}?action=all`);
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'Error desconocido de la API');
+  applyData(json.data);
+}
+
+/** Toma el objeto crudo {alumnos, docentes, docenteGrupo, categorias, subcategorias, incidencias}
+ *  y llena STUDENTS/TEACHERS/CATEGORIAS/INCIDENTS/MAP */
+function applyData(d){
+  MAP = {
+    lugarByNombre: Object.fromEntries(LUGARES.map(l=>[l.nombre, l.lugar_id])),
+    lugarById: Object.fromEntries(LUGARES.map(l=>[l.lugar_id, l.nombre])),
+    gravedadByNombre: Object.fromEntries(GRAVEDADES.map(g=>[g.nombre, g.gravedad_id])),
+    gravedadById: Object.fromEntries(GRAVEDADES.map(g=>[g.gravedad_id, g.nombre])),
+    estadoByNombre: Object.fromEntries(ESTADOS_CAT.map(e=>[e.nombre, e.estado_id])),
+    estadoById: Object.fromEntries(ESTADOS_CAT.map(e=>[e.estado_id, e.nombre])),
+    categoriaByNombre: {}, categoriaById: {},
+    subcategoriaByNombre: {}, subcategoriaById: {}, subcategoriaCategoriaId: {},
+    alumnoById: {}, docenteById: {}, docenteByNombre: {}
+  };
+
+  // Alumnos
+  STUDENTS = d.alumnos
+    .filter(a => String(a.activo).trim().toLowerCase() !== 'no')
+    .map(a => ({ id: Number(a.alumno_id), nombre: String(a.nombre), grado: String(a.grado), grupo: a.grupo ? String(a.grupo) : null }));
+  STUDENTS.forEach(s => MAP.alumnoById[s.id] = s);
+
+  // Docentes + su relación con grupos (Dim_Docente_Grupo)
+  const gruposPorDocente = {};
+  d.docenteGrupo.forEach(g => {
+    const did = Number(g.docente_id);
+    (gruposPorDocente[did] = gruposPorDocente[did] || []).push({
+      codigo: g.codigo_origen, grado: String(g.grado), grupo: g.grupo ? String(g.grupo) : null, seccion: g.seccion
+    });
+  });
+  TEACHERS = d.docentes.map(t => ({
+    id: Number(t.docente_id), nombre: String(t.nombre), materias: String(t.materias || ''),
+    secciones: String(t.secciones || ''), grupos: gruposPorDocente[Number(t.docente_id)] || []
+  }));
+  TEACHERS.forEach(t => { MAP.docenteById[t.id] = t; MAP.docenteByNombre[t.nombre] = t; });
+
+  // Categorías / Subcategorías
+  CATEGORIAS = {};
+  d.categorias.forEach(c => {
+    CATEGORIAS[c.nombre] = [];
+    MAP.categoriaByNombre[c.nombre] = Number(c.categoria_id);
+    MAP.categoriaById[Number(c.categoria_id)] = c.nombre;
+  });
+  d.subcategorias.forEach(s => {
+    const catNombre = MAP.categoriaById[Number(s.categoria_id)];
+    if(catNombre) CATEGORIAS[catNombre].push(s.nombre);
+    MAP.subcategoriaByNombre[s.nombre] = Number(s.subcategoria_id);
+    MAP.subcategoriaById[Number(s.subcategoria_id)] = s.nombre;
+    MAP.subcategoriaCategoriaId[Number(s.subcategoria_id)] = Number(s.categoria_id);
+  });
+  CATEGORIA_LIST = Object.keys(CATEGORIAS);
+
+  // Incidencias (Fact_Incidencias) -> se transforman a objetos de texto que ya usa la interfaz
+  INCIDENTS = d.incidencias.map(fila => filaIncidenciaATextoUI(fila))
+    .filter(Boolean)
+    .sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || String(b.createdAt).localeCompare(String(a.createdAt)));
+
+  // Seguimientos (Fact_Seguimientos) -> misma lógica de transformación
+  SEGUIMIENTOS = (d.seguimientos || []).map(fila => filaSeguimientoATextoUI(fila))
+    .filter(Boolean)
+    .sort((a,b)=> (b.fecha||'').localeCompare(a.fecha||'') || String(b.createdAt).localeCompare(String(a.createdAt)));
+}
+
+/** Convierte una fila cruda de Fact_Seguimientos al objeto de texto que usa la UI */
+function filaSeguimientoATextoUI(fila){
+  if(!fila.seguimiento_id) return null;
+  const docente = fila.registrado_por_docente_id ? MAP.docenteById[Number(fila.registrado_por_docente_id)] : null;
+  return {
+    id: String(fila.seguimiento_id),
+    studentId: Number(fila.alumno_id),
+    incidenciaId: fila.incidencia_id ? String(fila.incidencia_id) : null,
+    fecha: fila.fecha ? String(fila.fecha).slice(0,10) : '',
+    tipo: String(fila.tipo || ''),
+    descripcion: String(fila.descripcion || ''),
+    registradoPor: docente ? docente.nombre : String(fila.registrado_por_texto || ''),
+    registradoPorDocenteId: docente ? docente.id : null,
+    createdAt: fila.fecha_registro ? String(fila.fecha_registro) : ''
+  };
+}
+
+/** Convierte una fila cruda de Fact_Incidencias (con *_id) al objeto de texto que usa la UI */
+function filaIncidenciaATextoUI(fila){
+  const alumno = MAP.alumnoById[Number(fila.alumno_id)];
+  const categoriaNombre = MAP.categoriaById[Number(fila.categoria_id)] || '';
+  const subNombre = MAP.subcategoriaById[Number(fila.subcategoria_id)] || '';
+  const docente = fila.docente_reporta_id ? MAP.docenteById[Number(fila.docente_reporta_id)] : null;
+  return {
+    id: String(fila.incidencia_id),
+    studentId: alumno ? alumno.id : Number(fila.alumno_id),
+    studentName: alumno ? alumno.nombre : String(fila.alumno_nombre || ''),
+    grado: alumno ? alumno.grado : '',
+    grupo: alumno ? alumno.grupo : null,
+    fecha: fila.fecha ? String(fila.fecha).slice(0,10) : '',
+    lugar: MAP.lugarById[Number(fila.lugar_id)] || '',
+    categoria: categoriaNombre,
+    subtipo: subNombre,
+    gravedad: MAP.gravedadById[Number(fila.gravedad_id)] || '',
+    descripcion: String(fila.descripcion || ''),
+    accionTomada: String(fila.accion_tomada || ''),
+    reportadoPor: docente ? docente.nombre : String(fila.reportado_por_texto || ''),
+    reportadoPorDocenteId: docente ? docente.id : null,
+    estado: MAP.estadoById[Number(fila.estado_id)] || 'Abierta',
+    seguimiento: String(fila.requiere_seguimiento).trim().toLowerCase() === 'sí' || String(fila.requiere_seguimiento).trim().toLowerCase() === 'si',
+    notifico: String(fila.notifico_padres).trim().toLowerCase() === 'sí' || String(fila.notifico_padres).trim().toLowerCase() === 'si',
+    createdAt: fila.fecha_registro ? String(fila.fecha_registro) : ''
+  };
+}
+
+/** Convierte el objeto de texto de la UI a una fila con *_id para escribir en Fact_Incidencias */
+function incidenciaTextoAFilaId(inc){
+  const docente = MAP.docenteByNombre[inc.reportadoPor];
+  return {
+    incidencia_id: inc.id,
+    alumno_id: inc.studentId,
+    alumno_nombre: inc.studentName,
+    fecha: inc.fecha,
+    lugar_id: MAP.lugarByNombre[inc.lugar] || '',
+    categoria_id: MAP.categoriaByNombre[inc.categoria] || '',
+    subcategoria_id: MAP.subcategoriaByNombre[inc.subtipo] || '',
+    gravedad_id: MAP.gravedadByNombre[inc.gravedad] || '',
+    descripcion: inc.descripcion,
+    accion_tomada: inc.accionTomada,
+    docente_reporta_id: docente ? docente.id : '',
+    reportado_por_texto: docente ? '' : inc.reportadoPor,
+    estado_id: MAP.estadoByNombre[inc.estado] || '',
+    requiere_seguimiento: inc.seguimiento ? 'Sí' : 'No',
+    notifico_padres: inc.notifico ? 'Sí' : 'No'
+  };
+}
+
+/* ---------- Llamadas a la API (Fact_Incidencias) ---------- */
+async function apiPost(payload){
+  const res = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // evita preflight CORS con Apps Script
+    body: JSON.stringify(payload)
+  });
+  if(!res.ok) throw new Error('HTTP '+res.status);
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || 'Error desconocido de la API');
+  return json;
+}
+async function apiCrearIncidencia(incTextoUI){
+  return apiPost({ action:'crearIncidencia', incidencia: incidenciaTextoAFilaId(incTextoUI) });
+}
+async function apiActualizarEstado(incidenciaId, estadoTexto){
+  return apiPost({ action:'actualizarEstadoIncidencia', incidencia_id: incidenciaId, estado_id: MAP.estadoByNombre[estadoTexto] });
+}
+async function apiEliminarIncidencia(incidenciaId){
+  return apiPost({ action:'eliminarIncidencia', incidencia_id: incidenciaId });
+}
+async function apiCrearSeguimiento(seguimiento){
+  return apiPost({ action:'crearSeguimiento', seguimiento });
+}
+async function apiEliminarSeguimiento(seguimientoId){
+  return apiPost({ action:'eliminarSeguimiento', seguimiento_id: seguimientoId });
+}
 
 let INCIDENTS = [];
+let SEGUIMIENTOS = [];
 let currentUser = null; // {role:'admin'} o {role:'teacher', teacherId, teacherName}
 let selectedStudent = null;
 let selectedGravedad = null;
 let editingIncidentId = null;
-
-/* ---------- Storage ---------- */
-async function loadIncidents(){
-  try{
-    const res = await window.storage.get('incidents-v1', true);
-    INCIDENTS = res && res.value ? JSON.parse(res.value) : [];
-  }catch(e){
-    INCIDENTS = [];
-  }
-}
-async function saveIncidents(){
-  try{
-    await window.storage.set('incidents-v1', JSON.stringify(INCIDENTS), true);
-  }catch(e){
-    showToast('No se pudo guardar. Intenta de nuevo.');
-  }
-}
 
 /* ---------- Helpers ---------- */
 function studentsFor(grado, grupo){
@@ -719,9 +1031,55 @@ function scopedStudentsFor(grado, grupo){
 function scopedIncidents(){
   if(currentUser && currentUser.role==='teacher'){
     const ids = new Set(scopedStudents().map(s=>s.id));
-    return INCIDENTS.filter(i=>ids.has(i.studentId));
+    // Ve las incidencias de sus alumnos actuales, MÁS cualquier incidencia
+    // que él mismo haya registrado (por id de docente, no por texto), aunque
+    // ese alumno ya no aparezca en su lista de grupos actual.
+    return INCIDENTS.filter(i => ids.has(i.studentId) || i.reportadoPorDocenteId === currentUser.teacherId);
   }
   return INCIDENTS;
+}
+
+/** Actualiza los contadores numéricos junto a Historial/Alumnos/Docentes/
+ *  Seguimientos en el menú lateral. Alumnos, Historial y Seguimientos se
+ *  acotan según el rol (un profesor ve solo lo suyo); Docentes siempre
+ *  muestra el total (esa sección de cualquier forma solo es visible para
+ *  el administrador). El contador de Seguimientos usa el mismo criterio que
+ *  la barra "En seguimiento" de la gráfica "Incidencias por estado" en
+ *  Reportes: cuenta incidencias, no alumnos distintos. */
+function updateNavCounts(){
+  document.getElementById('nav-count-historial').textContent = scopedIncidents().length;
+  document.getElementById('nav-count-alumnos').textContent = scopedStudents().length;
+  document.getElementById('nav-count-docentes').textContent = TEACHERS.length;
+  document.getElementById('nav-count-seguimientos').textContent =
+    scopedIncidents().filter(i => i.estado === 'En seguimiento').length;
+}
+
+/** Alumnos del roster de un docente (por su docente_id), MÁS cualquier alumno
+ *  al que ese docente ya le haya levantado una incidencia (aunque ya no
+ *  pertenezca a su grupo actual). Función genérica reutilizada tanto para
+ *  el propio profesor logueado como, en el caso del administrador, para
+ *  cualquier profesor que filtre en Reportes. */
+function alumnosVisiblesParaDocente(docenteId){
+  const t = TEACHERS.find(x=>x.id===docenteId);
+  const roster = t ? studentsForTeacher(t) : [];
+  const idsConIncidencia = new Set(
+    INCIDENTS.filter(i => i.reportadoPorDocenteId === docenteId).map(i => i.studentId)
+  );
+  const mapa = new Map();
+  roster.forEach(s => mapa.set(s.id, s));
+  STUDENTS.filter(s => idsConIncidencia.has(s.id)).forEach(s => mapa.set(s.id, s));
+  return [...mapa.values()];
+}
+
+/** Alumnos de su roster actual, MÁS cualquier alumno al que el profesor ya
+ *  le haya levantado una incidencia (aunque ya no pertenezca a su grupo
+ *  actual). Se usa para el buscador de "Seguimientos", así el profesor
+ *  siempre puede darle seguimiento a los alumnos que él mismo reportó. */
+function alumnosVisiblesParaSeguimiento(){
+  if(currentUser && currentUser.role==='teacher'){
+    return alumnosVisiblesParaDocente(currentUser.teacherId);
+  }
+  return STUDENTS;
 }
 
 function gradosPresentes(){
@@ -762,6 +1120,7 @@ document.querySelectorAll('.navbtn').forEach(btn=>{
     if(btn.dataset.view==='dashboard') renderDashboard();
     if(btn.dataset.view==='alumnos') renderAlumnos();
     if(btn.dataset.view==='docentes') renderDocentes();
+    if(btn.dataset.view==='seguimientos') renderSeguimientoTimeline();
     closeMobileMenu();
   });
 });
@@ -781,7 +1140,7 @@ document.getElementById('sidebar-overlay').addEventListener('click', closeMobile
 /* ---------- Formulario: nueva incidencia ---------- */
 function populateGradoSelects(){
   const grados = gradosPresentes();
-  ['new-grado','f-grado','stu-grado'].forEach(id=>{
+  ['new-grado','f-grado','stu-grado','dash-f-grado'].forEach(id=>{
     const sel = document.getElementById(id);
     const defaultLabel = id==='stu-grado' ? 'Todos los grados' : 'Todos';
     sel.innerHTML = `<option value="">${defaultLabel}</option>`;
@@ -791,9 +1150,14 @@ function populateGradoSelects(){
     });
   });
 }
-populateGradoSelects();
 
-document.getElementById('docentes-list').innerHTML = TEACHERS.map(t=>`<option value="${t.nombre}">`).join('');
+/** Llena el filtro "Profesor" del dashboard (solo tiene sentido para el
+ *  administrador; para un profesor, sus datos ya están acotados a él mismo). */
+function populateDashFiltros(){
+  const sel = document.getElementById('dash-f-profesor');
+  const actuales = TEACHERS.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  sel.innerHTML = '<option value="">Todos</option>' + actuales.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('');
+}
 
 /* ---------- Categoría / subclasificación (formulario nuevo) ---------- */
 const newCategoria = document.getElementById('new-categoria');
@@ -807,12 +1171,12 @@ function populateNewSubtipo(){
   newSubtipo.innerHTML = subs.map(s=>`<option>${s}</option>`).join('');
 }
 newCategoria.addEventListener('change', populateNewSubtipo);
-populateNewCategoria();
 
 /* ---------- Filtros de historial: categoría / subclasificación ---------- */
 const fCategoria = document.getElementById('f-categoria');
 const fSubtipo = document.getElementById('f-subtipo');
 function populateFiltroCategoria(){
+  fCategoria.innerHTML = '<option value="">Todas</option>';
   CATEGORIA_LIST.forEach(c=>{
     const o=document.createElement('option'); o.value=c; o.textContent=c; fCategoria.appendChild(o);
   });
@@ -823,9 +1187,84 @@ function populateFiltroSubtipo(){
   fSubtipo.innerHTML = '<option value="">Todas</option>' + subs.map(s=>`<option>${s}</option>`).join('');
   if(subs.includes(current)) fSubtipo.value = current;
 }
-populateFiltroCategoria();
-populateFiltroSubtipo();
 fCategoria.addEventListener('change', ()=>{ populateFiltroSubtipo(); renderHistorial(); });
+
+/* ---------- Lugar / Estado (catálogos fijos LUGARES / ESTADOS_CAT) ---------- */
+function populateLugarYEstado(){
+  const lugarSel = document.getElementById('new-lugar');
+  lugarSel.innerHTML = LUGARES.map(l=>`<option>${l.nombre}</option>`).join('');
+  const estadoSel = document.getElementById('new-estado');
+  estadoSel.innerHTML = ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
+  const fEstado = document.getElementById('f-estado');
+  fEstado.innerHTML = '<option value="">Todos</option>' + ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
+}
+
+/* Agrupa todas las inicializaciones que dependen de los datos cargados desde el Sheet */
+function initFormsAndFilters(){
+  populateGradoSelects();
+  document.getElementById('docentes-list').innerHTML =
+    '<option value="Administrador">' +
+    TEACHERS.map(t=>`<option value="${t.nombre}">`).join('');
+  populateNewCategoria();
+  populateFiltroCategoria();
+  populateFiltroSubtipo();
+  populateLugarYEstado();
+  populateDashFiltros();
+}
+
+document.getElementById('dash-f-seccion').addEventListener('change', renderDashboard);
+document.getElementById('dash-f-grado').addEventListener('change', renderDashboard);
+document.getElementById('dash-f-alumno').addEventListener('input', ()=>{ renderDashboard(); runDashAlumnoAutocomplete(); });
+document.getElementById('dash-f-limpiar').addEventListener('click', ()=>{
+  document.getElementById('dash-f-profesor').value = '';
+  document.getElementById('dash-f-alumno').value = '';
+  document.getElementById('dash-f-seccion').value = '';
+  document.getElementById('dash-f-grado').value = '';
+  renderDashboard();
+});
+
+/* ---------- Filtro "Alumno" de Reportes: desplegable al dar clic ---------- */
+const dashAlumnoInput = document.getElementById('dash-f-alumno');
+const dashAlumnoAcResults = document.getElementById('dash-alumno-ac-results');
+dashAlumnoInput.addEventListener('focus', runDashAlumnoAutocomplete);
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('#view-dashboard .autocomplete')) dashAlumnoAcResults.classList.remove('show');
+});
+
+function dashAlumnoOpciones(){
+  if(currentUser.role==='teacher') return alumnosVisiblesParaSeguimiento();
+  const profesorId = document.getElementById('dash-f-profesor').value;
+  const seccion = document.getElementById('dash-f-seccion').value;
+  const grado = document.getElementById('dash-f-grado').value;
+  let base = profesorId ? alumnosVisiblesParaDocente(Number(profesorId)) : STUDENTS;
+  if(seccion) base = base.filter(s=>GRADO_SECCION[s.grado]===seccion);
+  if(grado) base = base.filter(s=>s.grado===grado);
+  return base;
+}
+
+function runDashAlumnoAutocomplete(){
+  const q = dashAlumnoInput.value.trim().toLowerCase();
+  let list = dashAlumnoOpciones().slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(q) list = list.filter(s=>s.nombre.toLowerCase().includes(q));
+  list = list.slice(0,40);
+  dashAlumnoAcResults.innerHTML = list.map(s=>
+    `<div class="ac-item" data-nombre="${s.nombre.replace(/"/g,'&quot;')}"><span>${s.nombre}</span><span class="g">${s.grado}${s.grupo?(' '+s.grupo):''}</span></div>`
+  ).join('') || '<div class="ac-item" style="color:var(--ink-faint);cursor:default;">Sin resultados</div>';
+  dashAlumnoAcResults.classList.add('show');
+  dashAlumnoAcResults.querySelectorAll('.ac-item[data-nombre]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      dashAlumnoInput.value = el.dataset.nombre;
+      dashAlumnoAcResults.classList.remove('show');
+      renderDashboard();
+    });
+  });
+}
+// Si cambia el profesor filtrado, la lista de alumnos disponibles cambia también
+document.getElementById('dash-f-profesor').addEventListener('change', ()=>{
+  dashAlumnoInput.value = '';
+  renderDashboard();
+});
+
 
 const newGrado = document.getElementById('new-grado');
 const newGrupo = document.getElementById('new-grupo');
@@ -899,7 +1338,7 @@ function limpiarForm(){
   populateNewSubtipo();
   document.getElementById('new-desc').value='';
   document.getElementById('new-accion').value='';
-  document.getElementById('new-reporta').value = (currentUser && currentUser.role==='teacher') ? currentUser.teacherName : '';
+  document.getElementById('new-reporta').value = (currentUser && currentUser.role==='teacher') ? currentUser.teacherName : (currentUser && currentUser.role==='admin' ? 'Administrador' : '');
   document.getElementById('new-estado').selectedIndex = 0;
   document.getElementById('new-seguimiento').checked=false;
   document.getElementById('new-notifico').checked=false;
@@ -931,16 +1370,26 @@ document.getElementById('btn-guardar').addEventListener('click', async ()=>{
     descripcion: desc,
     accionTomada: document.getElementById('new-accion').value.trim(),
     reportadoPor: reporta,
+    reportadoPorDocenteId: (MAP.docenteByNombre[reporta] ? MAP.docenteByNombre[reporta].id : null),
     estado: document.getElementById('new-estado').value,
     seguimiento: document.getElementById('new-seguimiento').checked,
     notifico: document.getElementById('new-notifico').checked,
     createdAt: new Date().toISOString()
   };
-  INCIDENTS.unshift(incident);
-  await saveIncidents();
-  updateNavCounts();
-  showToast('Incidencia guardada.');
-  limpiarForm();
+  const btnGuardar = document.getElementById('btn-guardar');
+  btnGuardar.disabled = true; btnGuardar.textContent = 'Guardando…';
+  try{
+    await apiCrearIncidencia(incident);
+    INCIDENTS.unshift(incident);
+    updateNavCounts();
+    showToast('Incidencia guardada.');
+    limpiarForm();
+  }catch(err){
+    showToast('No se pudo guardar en Google Sheets. Revisa tu conexión.');
+    console.error(err);
+  }finally{
+    btnGuardar.disabled = false; btnGuardar.textContent = 'Guardar incidencia';
+  }
 });
 
 /* ---------- Historial ---------- */
@@ -1035,45 +1484,217 @@ function openModal(id){
     </div>
     <div class="field">
       <label>Estado</label>
+      ${currentUser.role==='admin' ? `
       <select id="modal-estado">
         <option ${i.estado==='Abierta'?'selected':''}>Abierta</option>
         <option ${i.estado==='En seguimiento'?'selected':''}>En seguimiento</option>
         <option ${i.estado==='Cerrada'?'selected':''}>Cerrada</option>
-      </select>
+      </select>` : `<div>${i.estado}</div>`}
     </div>
     <div class="modal-actions">
-      <button class="btn btn-danger" id="modal-delete">Eliminar incidencia</button>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost" id="modal-export-pdf">Exportar PDF</button>
+        ${currentUser.role==='admin' ? '<button class="btn btn-danger" id="modal-delete">Eliminar incidencia</button>' : ''}
+      </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-ghost" id="modal-cancel">Cerrar</button>
-        <button class="btn btn-primary" id="modal-save">Guardar cambios</button>
+        ${currentUser.role==='admin' ? '<button class="btn btn-primary" id="modal-save">Guardar cambios</button>' : ''}
       </div>
     </div>
   `;
   document.getElementById('modal-bg').classList.add('show');
   document.getElementById('modal-x').addEventListener('click', closeModal);
   document.getElementById('modal-cancel').addEventListener('click', closeModal);
-  document.getElementById('modal-save').addEventListener('click', async ()=>{
-    i.estado = document.getElementById('modal-estado').value;
-    await saveIncidents();
-    renderHistorial(); renderDashboard(); updateNavCounts();
-    showToast('Cambios guardados.');
-    closeModal();
-  });
-  document.getElementById('modal-delete').addEventListener('click', async ()=>{
-    if(!confirm('¿Eliminar esta incidencia? Esta acción no se puede deshacer.')) return;
-    INCIDENTS = INCIDENTS.filter(x=>x.id!==i.id);
-    await saveIncidents();
-    renderHistorial(); renderDashboard(); updateNavCounts();
-    showToast('Incidencia eliminada.');
-    closeModal();
-  });
+  const modalSaveBtn = document.getElementById('modal-save');
+  if(modalSaveBtn){
+    modalSaveBtn.addEventListener('click', async ()=>{
+      const nuevoEstado = document.getElementById('modal-estado').value;
+      try{
+        await apiActualizarEstado(i.id, nuevoEstado);
+        i.estado = nuevoEstado;
+        renderHistorial(); renderDashboard(); updateNavCounts();
+        showToast('Cambios guardados.');
+        closeModal();
+      }catch(err){
+        showToast('No se pudo actualizar en Google Sheets.');
+        console.error(err);
+      }
+    });
+  }
+  const modalDeleteBtn = document.getElementById('modal-delete');
+  if(modalDeleteBtn){
+    modalDeleteBtn.addEventListener('click', async ()=>{
+      if(!confirm('¿Eliminar esta incidencia? Esta acción no se puede deshacer.')) return;
+      try{
+        await apiEliminarIncidencia(i.id);
+        INCIDENTS = INCIDENTS.filter(x=>x.id!==i.id);
+        renderHistorial(); renderDashboard(); updateNavCounts();
+        showToast('Incidencia eliminada.');
+        closeModal();
+      }catch(err){
+        showToast('No se pudo eliminar en Google Sheets.');
+        console.error(err);
+      }
+    });
+  }
+  document.getElementById('modal-export-pdf').addEventListener('click', ()=> exportarIncidenciaPDF(i));
 }
 function closeModal(){ document.getElementById('modal-bg').classList.remove('show'); editingIncidentId=null; }
 document.getElementById('modal-bg').addEventListener('click', (e)=>{ if(e.target.id==='modal-bg') closeModal(); });
 
+/** Genera y descarga un PDF formal con el detalle de una incidencia,
+ *  pensado para enviarse o entregarse a los padres de familia. */
+function exportarIncidenciaPDF(i){
+  if(!window.jspdf){
+    showToast('No se pudo cargar el generador de PDF. Revisa tu conexión.');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+  const pageW = doc.internal.pageSize.getWidth();
+  const marginX = 54;
+  let y = 0;
+
+  const NAVY = [24, 53, 93];
+  const INK = [34, 38, 30];
+  const INK_SOFT = [90, 100, 90];
+  const BORDER = [225, 220, 203];
+
+  // ---- Encabezado institucional ----
+  doc.setFillColor(...NAVY);
+  doc.rect(0, 0, pageW, 86, 'F');
+  try{
+    doc.addImage(LOGO_BASE64, 'PNG', marginX, 18, 50, 50);
+  }catch(e){ /* si el logo no carga, seguimos sin él */ }
+  doc.setTextColor(255,255,255);
+  doc.setFont('times', 'bold');
+  doc.setFontSize(20);
+  doc.text('Los Sauces', marginX + 62, 42);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.text('Reporte de incidencia de comportamiento', marginX + 62, 60);
+  y = 118;
+
+  // ---- Título del alumno ----
+  doc.setTextColor(...INK);
+  doc.setFont('times', 'bold');
+  doc.setFontSize(16);
+  doc.text(i.studentName, marginX, y);
+  y += 18;
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...INK_SOFT);
+  doc.text(`${i.grado}${i.grupo ? ' · Grupo ' + i.grupo : ''}  ·  Fecha del incidente: ${fmtDate(i.fecha)}  ·  Lugar: ${i.lugar}`, marginX, y);
+  y += 20;
+  doc.setDrawColor(...BORDER);
+  doc.line(marginX, y, pageW - marginX, y);
+  y += 26;
+
+  // ---- Bloque de clasificación ----
+  const campo = (etiqueta, valor) => {
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(...INK_SOFT);
+    doc.text(etiqueta.toUpperCase(), marginX, y);
+    y += 14;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(11);
+    doc.setTextColor(...INK);
+    const lineas = doc.splitTextToSize(String(valor || '—'), pageW - marginX*2);
+    doc.text(lineas, marginX, y);
+    y += lineas.length * 14 + 18;
+  };
+
+  campo('Categoría', `${i.categoria} — ${i.subtipo}`);
+  campo('Gravedad', i.gravedad);
+  campo('Descripción del incidente', i.descripcion);
+  campo('Acción tomada por el colegio', i.accionTomada || 'Sin registrar');
+  campo('Reportado por', i.reportadoPor);
+  campo('¿Se notificó a los padres?', i.notifico ? 'Sí' : 'No');
+  campo('Estado actual', i.estado);
+
+  // ---- Pie de página ----
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let p = 1; p <= pageCount; p++){
+    doc.setPage(p);
+    const footY = doc.internal.pageSize.getHeight() - 34;
+    doc.setDrawColor(...BORDER);
+    doc.line(marginX, footY - 10, pageW - marginX, footY - 10);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...INK_SOFT);
+    doc.text(`Colegio Los Sauces · Documento generado el ${new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'})}`, marginX, footY);
+  }
+
+  const nombreArchivo = `Incidencia_${i.studentName.replace(/\s+/g,'_')}_${i.fecha || 'sin_fecha'}.pdf`;
+  doc.save(nombreArchivo);
+}
+
+
+const SECCIONES_LIST = ['Primaria Baja','Primaria Alta','Secundaria','Preparatoria'];
+
+/** Recalcula las opciones disponibles de Profesor, Sección y Grado en Reportes
+ *  para que se mantengan sincronizadas entre sí (ej. si eliges "Primaria Baja",
+ *  el filtro de Grado solo debe ofrecer 1°-3°). Solo aplica a la vista de
+ *  administrador; el profesor no ve estos filtros cruzados entre sí. */
+function syncDashFiltros(){
+  if(!currentUser || currentUser.role !== 'admin') return;
+  const selProf = document.getElementById('dash-f-profesor');
+  const selSeccion = document.getElementById('dash-f-seccion');
+  const selGrado = document.getElementById('dash-f-grado');
+
+  const profesorId = selProf.value ? Number(selProf.value) : null;
+  const seccionVal = selSeccion.value;
+  const gradoVal = selGrado.value;
+  const profesorSel = profesorId!=null ? TEACHERS.find(x=>x.id===profesorId) : null;
+
+  // --- Opciones de Sección: solo las que da ese profesor, si hay uno elegido ---
+  let seccionesDisponibles = SECCIONES_LIST;
+  if(profesorSel) seccionesDisponibles = seccionesDisponibles.filter(s=>profesorSel.grupos.some(g=>g.seccion===s));
+  const seccionSigueValida = !seccionVal || seccionesDisponibles.includes(seccionVal);
+  selSeccion.innerHTML = '<option value="">Todas las secciones</option>' +
+    seccionesDisponibles.map(s=>`<option${s===seccionVal?' selected':''}>${s}</option>`).join('');
+  if(!seccionSigueValida) selSeccion.value = '';
+  const seccionEfectiva = selSeccion.value;
+
+  // --- Opciones de Grado: acotadas por Sección y por el profesor elegido ---
+  let gradosDisponibles = gradosPresentes();
+  if(seccionEfectiva) gradosDisponibles = gradosDisponibles.filter(g=>GRADO_SECCION[g]===seccionEfectiva);
+  if(profesorSel) gradosDisponibles = gradosDisponibles.filter(g=>profesorSel.grupos.some(x=>x.grado===g));
+  const gradoSigueValido = !gradoVal || gradosDisponibles.includes(gradoVal);
+  selGrado.innerHTML = '<option value="">Todos</option>' +
+    gradosDisponibles.map(g=>`<option${g===gradoVal?' selected':''}>${g}</option>`).join('');
+  if(!gradoSigueValido) selGrado.value = '';
+  const gradoEfectivo = selGrado.value;
+
+  // --- Opciones de Profesor: solo quienes dan clase en la Sección/Grado elegidos ---
+  let profesoresDisponibles = TEACHERS.slice();
+  if(seccionEfectiva) profesoresDisponibles = profesoresDisponibles.filter(t=>t.grupos.some(g=>g.seccion===seccionEfectiva));
+  if(gradoEfectivo) profesoresDisponibles = profesoresDisponibles.filter(t=>t.grupos.some(g=>g.grado===gradoEfectivo));
+  profesoresDisponibles.sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  const profesorSigueValido = profesorId==null || profesoresDisponibles.some(t=>t.id===profesorId);
+  selProf.innerHTML = '<option value="">Todos</option>' +
+    profesoresDisponibles.map(t=>`<option value="${t.id}"${t.id===profesorId?' selected':''}>${t.nombre}</option>`).join('');
+  if(!profesorSigueValido) selProf.value = '';
+}
+
 /* ---------- Dashboard ---------- */
 function renderDashboard(){
-  const incidents = scopedIncidents();
+  syncDashFiltros();
+  let incidents = scopedIncidents();
+
+  // Filtros del dashboard (Profesor y Grado solo existen para el administrador;
+  // Alumno aplica para cualquier rol)
+  const fProfesorEl = document.getElementById('dash-f-profesor');
+  const fProfesorId = (currentUser.role==='admin' && fProfesorEl) ? fProfesorEl.value : '';
+  const fAlumno = document.getElementById('dash-f-alumno').value.trim().toLowerCase();
+  const fSeccion = document.getElementById('dash-f-seccion').value;
+  const fGrado = document.getElementById('dash-f-grado').value;
+  if(fProfesorId) incidents = incidents.filter(i=>i.reportadoPorDocenteId===Number(fProfesorId));
+  if(fAlumno) incidents = incidents.filter(i=>i.studentName.toLowerCase().includes(fAlumno));
+  if(fSeccion) incidents = incidents.filter(i=>GRADO_SECCION[i.grado]===fSeccion);
+  if(fGrado) incidents = incidents.filter(i=>i.grado===fGrado);
+
   const total = incidents.length;
   const abiertas = incidents.filter(i=>i.estado!=='Cerrada').length;
   const since = new Date(); since.setDate(since.getDate()-30);
@@ -1102,12 +1723,18 @@ function renderDashboard(){
     .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Aún no hay incidencias registradas.</div>';
 
   const porGrado = {};
-  gradosPresentes().forEach(g=>porGrado[g]=0);
-  incidents.forEach(i=>porGrado[i.grado]=(porGrado[i.grado]||0)+1);
+  // Los grados que aparece la gráfica salen directamente de las incidencias
+  // YA FILTRADAS (por Profesor/Alumno/Sección/Grado), no de una lista aparte.
+  // Así, si filtras un grado o un alumno específico, la gráfica solo muestra
+  // lo que realmente queda después de ese filtro — nunca "de más".
+  const gradosEnFiltrado = [...new Set(incidents.map(i=>i.grado))]
+    .sort((a,b)=>GRADE_ORDER.indexOf(a)-GRADE_ORDER.indexOf(b));
+  gradosEnFiltrado.forEach(g=>porGrado[g]=0);
+  incidents.forEach(i=>{ if(porGrado.hasOwnProperty(i.grado)) porGrado[i.grado]++; });
   const maxGrado = Math.max(1, ...Object.values(porGrado));
-  document.getElementById('chart-grado').innerHTML = Object.entries(porGrado)
+  document.getElementById('chart-grado').innerHTML = gradosEnFiltrado.length ? Object.entries(porGrado)
     .map(([g,n])=>`<div class="bar-row"><span class="lbl">${g}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxGrado*100)}%"></div></div><span class="n">${n}</span></div>`)
-    .join('');
+    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
 
   const byStudent = {};
   incidents.forEach(i=>{
@@ -1118,6 +1745,121 @@ function renderDashboard(){
   document.getElementById('top-students').innerHTML = top.length ? top.map(s=>
     `<div class="ts-row"><span>${s.name} <span class="n">· ${s.grado}${s.grupo?(' '+s.grupo):''}</span></span><span class="c">${s.count}</span></div>`
   ).join('') : '<div style="color:var(--ink-faint);font-size:13px;padding:10px 0;">Aún no hay incidencias registradas.</div>';
+
+  // Profesores con más incidencias (solo tiene sentido mostrarlo al administrador)
+  const panelTeachers = document.getElementById('panel-top-teachers');
+  const panelStudents = document.getElementById('panel-top-students');
+  if(currentUser.role==='admin'){
+    panelTeachers.style.display = '';
+    panelStudents.style.gridColumn = '';
+    const byTeacher = {};
+    incidents.forEach(i=>{
+      const key = i.reportadoPorDocenteId != null ? ('id:'+i.reportadoPorDocenteId) : ('txt:'+i.reportadoPor);
+      const nombre = i.reportadoPor || 'Sin especificar';
+      byTeacher[key] = byTeacher[key] || {name:nombre, count:0};
+      byTeacher[key].count++;
+    });
+    const topT = Object.values(byTeacher).sort((a,b)=>b.count-a.count).slice(0,6);
+    document.getElementById('top-teachers').innerHTML = topT.length ? topT.map(t=>
+      `<div class="ts-row"><span>${t.name}</span><span class="c">${t.count}</span></div>`
+    ).join('') : '<div style="color:var(--ink-faint);font-size:13px;padding:10px 0;">Aún no hay incidencias registradas.</div>';
+  } else {
+    panelTeachers.style.display = 'none';
+    panelStudents.style.gridColumn = '1 / -1';
+  }
+
+  // Incidencias por lugar
+  const porLugar = {};
+  incidents.forEach(i=>{ if(i.lugar) porLugar[i.lugar] = (porLugar[i.lugar]||0)+1; });
+  const lugaresConDatos = Object.entries(porLugar).sort((a,b)=>b[1]-a[1]);
+  const maxLugar = Math.max(1, ...Object.values(porLugar));
+  document.getElementById('chart-lugar').innerHTML = lugaresConDatos.length ? lugaresConDatos
+    .map(([l,n])=>`<div class="bar-row"><span class="lbl">${l}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxLugar*100)}%"></div></div><span class="n">${n}</span></div>`)
+    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+
+  // Incidencias por gravedad (con el mismo color que ya usan las etiquetas Leve/Moderada/Grave)
+  const GRAVEDAD_COLOR = {'Leve':'var(--leve)','Moderada':'var(--moderada)','Grave':'var(--grave)'};
+  const porGravedad = {};
+  GRAVEDADES.forEach(g=>porGravedad[g.nombre]=0);
+  incidents.forEach(i=>{ if(porGravedad.hasOwnProperty(i.gravedad)) porGravedad[i.gravedad]++; });
+  const maxGravedad = Math.max(1, ...Object.values(porGravedad));
+  document.getElementById('chart-gravedad').innerHTML = incidents.length ? Object.entries(porGravedad)
+    .map(([g,n])=>`<div class="bar-row"><span class="lbl">${g}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxGravedad*100)}%;background:${GRAVEDAD_COLOR[g]||'var(--primary)'}"></div></div><span class="n">${n}</span></div>`)
+    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+
+  // Incidencias por estado (mismo color que las etiquetas Abierta/En seguimiento/Cerrada)
+  const ESTADO_COLOR = {'Abierta':'var(--grave)','En seguimiento':'var(--moderada)','Cerrada':'var(--leve)'};
+  const porEstado = {};
+  ESTADOS_CAT.forEach(e=>porEstado[e.nombre]=0);
+  incidents.forEach(i=>{ if(porEstado.hasOwnProperty(i.estado)) porEstado[i.estado]++; });
+  const maxEstado = Math.max(1, ...Object.values(porEstado));
+  document.getElementById('chart-estado').innerHTML = incidents.length ? Object.entries(porEstado)
+    .map(([e,n])=>`<div class="bar-row"><span class="lbl">${e}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxEstado*100)}%;background:${ESTADO_COLOR[e]||'var(--primary)'}"></div></div><span class="n">${n}</span></div>`)
+    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+
+  // Incidencias a lo largo del tiempo (agrupadas por mes)
+  const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const porMes = {};
+  incidents.forEach(i=>{
+    if(!i.fecha) return;
+    const mes = i.fecha.slice(0,7);
+    porMes[mes] = (porMes[mes]||0)+1;
+  });
+  const mesesOrdenados = Object.keys(porMes).sort();
+  const datosLinea = mesesOrdenados.map(m=>{
+    const [y,mm] = m.split('-');
+    return { label: MESES_CORTOS[parseInt(mm,10)-1] + ' \'' + y.slice(2), value: porMes[m] };
+  });
+  renderLineChart('chart-linea', datosLinea);
+}
+
+/** Dibuja una gráfica de línea simple en SVG dentro del contenedor indicado.
+ *  dataPoints: [{label, value}, ...] ya en orden cronológico. */
+function renderLineChart(containerId, dataPoints){
+  const el = document.getElementById(containerId);
+  if(!dataPoints.length){
+    el.innerHTML = '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+    return;
+  }
+  const w = 720, h = 220, padL = 34, padR = 16, padT = 18, padB = 30;
+  const maxV = Math.max(1, ...dataPoints.map(d=>d.value));
+  const innerW = w - padL - padR, innerH = h - padT - padB;
+  const stepX = dataPoints.length > 1 ? innerW / (dataPoints.length - 1) : 0;
+  const pts = dataPoints.map((d,i)=>({
+    x: padL + stepX * i,
+    y: padT + innerH * (1 - d.value / maxV),
+    ...d
+  }));
+  const pathD = pts.map((p,i)=> (i===0?'M':'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+  const areaD = pathD +
+    ` L${pts[pts.length-1].x.toFixed(1)},${(h-padB).toFixed(1)}` +
+    ` L${pts[0].x.toFixed(1)},${(h-padB).toFixed(1)} Z`;
+
+  const gridSteps = [0, 0.5, 1];
+  const grid = gridSteps.map(f=>{
+    const y = padT + innerH * (1 - f);
+    const val = Math.round(maxV * f);
+    return `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}" stroke="var(--border)" stroke-width="1"/>
+            <text x="${padL-8}" y="${(y+3.5).toFixed(1)}" font-size="10" fill="var(--ink-faint)" text-anchor="end">${val}</text>`;
+  }).join('');
+
+  const everyN = dataPoints.length > 9 ? Math.ceil(dataPoints.length / 9) : 1;
+  const labels = pts.map((p,i)=>{
+    if(i % everyN !== 0 && i !== pts.length-1) return '';
+    return `<text x="${p.x.toFixed(1)}" y="${h-8}" font-size="10" fill="var(--ink-faint)" text-anchor="middle">${p.label}</text>`;
+  }).join('');
+
+  const dots = pts.map(p=>
+    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="var(--primary)" stroke="#fff" stroke-width="1.5"><title>${p.label}: ${p.value}</title></circle>`
+  ).join('');
+
+  el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">
+    ${grid}
+    <path d="${areaD}" fill="var(--primary-light)" opacity="0.7"/>
+    <path d="${pathD}" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
+    ${dots}
+    ${labels}
+  </svg>`;
 }
 
 /* ---------- Alumnos ---------- */
@@ -1177,6 +1919,317 @@ function openStudentProfile(id){
   document.getElementById('modal-x').addEventListener('click', closeModal);
   m.querySelectorAll('.inc-card[data-id]').forEach(el=>{
     el.addEventListener('click', ()=> openModal(el.dataset.id));
+  });
+}
+
+/* ---------- Seguimientos: buscador, línea del tiempo y alta ---------- */
+let seguimientoAlumnoSeleccionado = null;
+
+const segBuscarInput = document.getElementById('seg-buscar-alumno');
+const segAcResults = document.getElementById('seg-ac-results');
+segBuscarInput.addEventListener('input', runSegAutocomplete);
+segBuscarInput.addEventListener('focus', runSegAutocomplete);
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('#view-seguimientos .autocomplete')) segAcResults.classList.remove('show');
+});
+document.getElementById('seg-volver').addEventListener('click', ()=>{
+  seguimientoAlumnoSeleccionado = null;
+  renderSeguimientoTimeline();
+});
+
+/** Todos los alumnos visibles para esta sesión que tienen AL MENOS UNA
+ *  incidencia registrada (sin importar su estado ni si ya tienen algún
+ *  seguimiento). Se usa para la cuadrícula de "Seguimientos", así se puede
+ *  entrar a la línea del tiempo de cualquier alumno con historial. */
+function alumnosConIncidenciaRegistrada(){
+  const idsConIncidencia = new Set(scopedIncidents().map(i => i.studentId));
+  const universo = currentUser.role==='teacher' ? alumnosVisiblesParaSeguimiento() : STUDENTS;
+  return universo
+    .filter(s => idsConIncidencia.has(s.id))
+    .sort((a,b)=> GRADE_ORDER.indexOf(a.grado)-GRADE_ORDER.indexOf(b.grado) || a.nombre.localeCompare(b.nombre));
+}
+
+/** Lista, en tarjetas, a todos los alumnos visibles para esta sesión que
+ *  tienen al menos una incidencia registrada. Al dar clic en una tarjeta se
+ *  abre exactamente la misma vista de línea del tiempo que usa el buscador. */
+function renderSeguimientosAlumnosGrid(){
+  const lista = alumnosConIncidenciaRegistrada();
+
+  const grid = document.getElementById('seg-alumnos-grid');
+  if(lista.length===0){
+    grid.innerHTML = '<div class="empty">Todavía no hay ningún alumno con incidencias registradas.</div>';
+    return;
+  }
+  grid.innerHTML = lista.map(s=>{
+    const numIncidencias = scopedIncidents().filter(i=>i.studentId===s.id).length;
+    const numSeguimientos = SEGUIMIENTOS.filter(x=>x.studentId===s.id).length;
+    return `<div class="stu-card" data-id="${s.id}">
+      <div class="name">${s.nombre}</div>
+      <div class="grade">${s.grado}${s.grupo?(' · Grupo '+s.grupo):''}</div>
+      <span class="badge-count has">${numIncidencias} incidencia${numIncidencias===1?'':'s'}${numSeguimientos ? ' · '+numSeguimientos+' seguimiento'+(numSeguimientos===1?'':'s') : ''}</span>
+    </div>`;
+  }).join('');
+  grid.querySelectorAll('.stu-card').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      seguimientoAlumnoSeleccionado = STUDENTS.find(s=>s.id===+el.dataset.id);
+      renderSeguimientoTimeline();
+    });
+  });
+}
+
+function runSegAutocomplete(){
+  const q = segBuscarInput.value.trim().toLowerCase();
+  let list = alumnosVisiblesParaSeguimiento().slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  if(q) list = list.filter(s=>s.nombre.toLowerCase().includes(q));
+  list = list.slice(0,40);
+  segAcResults.innerHTML = list.map(s=>
+    `<div class="ac-item" data-id="${s.id}"><span>${s.nombre}</span><span class="g">${s.grado}${s.grupo?(' '+s.grupo):''}</span></div>`
+  ).join('') || '<div class="ac-item" style="color:var(--ink-faint);cursor:default;">Sin resultados</div>';
+  segAcResults.classList.add('show');
+  segAcResults.querySelectorAll('.ac-item[data-id]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      seguimientoAlumnoSeleccionado = alumnosVisiblesParaSeguimiento().find(s=>s.id===+el.dataset.id);
+      segAcResults.classList.remove('show');
+      segBuscarInput.value = '';
+      renderSeguimientoTimeline();
+    });
+  });
+}
+
+function renderSeguimientoTimeline(){
+  const s = seguimientoAlumnoSeleccionado;
+  if(!s){
+    document.getElementById('seg-lista-alumnos').style.display = 'block';
+    document.getElementById('seg-content').style.display = 'none';
+    renderSeguimientosAlumnosGrid();
+    return;
+  }
+  document.getElementById('seg-lista-alumnos').style.display = 'none';
+  document.getElementById('seg-content').style.display = 'block';
+  document.getElementById('seg-alumno-nombre').textContent = s.nombre;
+  document.getElementById('seg-alumno-meta').textContent = s.grado + (s.grupo?(' · Grupo '+s.grupo):'');
+
+  const incidentesAlumno = INCIDENTS.filter(i=>i.studentId===s.id).map(i=>({...i, __tipo:'incidente'}));
+  const seguimientosAlumno = SEGUIMIENTOS.filter(x=>x.studentId===s.id).map(x=>({...x, __tipo:'seguimiento'}));
+  const eventos = [...incidentesAlumno, ...seguimientosAlumno].sort((a,b)=>
+    (a.fecha||'').localeCompare(b.fecha||'') || String(a.createdAt).localeCompare(String(b.createdAt))
+  );
+
+  const box = document.getElementById('seg-timeline');
+  if(eventos.length===0){
+    box.innerHTML = '<div class="empty">Sin incidencias ni seguimientos registrados todavía para este alumno.</div>';
+    return;
+  }
+  box.innerHTML = '<div class="timeline">' + eventos.map(ev=>{
+    if(ev.__tipo==='incidente'){
+      return `<div class="tl-item">
+        <span class="tl-dot tl-incidente"></span>
+        <div class="tl-card">
+          <div class="tl-top">
+            <span class="tl-etiqueta tl-incidente">Incidencia</span>
+            <span class="tl-fecha">${fmtDate(ev.fecha)}</span>
+            <span class="badge badge-${ev.gravedad}">${ev.gravedad}</span>
+            <span class="badge ${badgeEstadoClass(ev.estado)}">${ev.estado}</span>
+          </div>
+          <p class="tl-desc"><b>${ev.categoria} · ${ev.subtipo}</b><br>${ev.descripcion.replace(/</g,'&lt;')}</p>
+          <div class="tl-por">Reportado por ${ev.reportadoPor}</div>
+        </div>
+      </div>`;
+    }
+    const claseTipo = 'tl-' + ev.tipo.replace(/\s+/g,'');
+    return `<div class="tl-item">
+      <span class="tl-dot ${claseTipo}"></span>
+      <div class="tl-card">
+        <div class="tl-top">
+          <span class="tl-etiqueta ${claseTipo}">${ev.tipo}</span>
+          <span class="tl-fecha">${fmtDate(ev.fecha)}</span>
+          ${currentUser.role==='admin' ? `<button class="tl-del" data-id="${ev.id}" title="Eliminar">Eliminar</button>` : ''}
+        </div>
+        <p class="tl-desc">${ev.descripcion.replace(/</g,'&lt;')}</p>
+        <div class="tl-por">Registrado por ${ev.registradoPor || '—'}</div>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+
+  box.querySelectorAll('.tl-del').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      if(!confirm('¿Eliminar esta entrada de seguimiento?')) return;
+      try{
+        await apiEliminarSeguimiento(btn.dataset.id);
+        SEGUIMIENTOS = SEGUIMIENTOS.filter(x=>x.id!==btn.dataset.id);
+        renderSeguimientoTimeline();
+        showToast('Seguimiento eliminado.');
+      }catch(err){
+        showToast('No se pudo eliminar.');
+        console.error(err);
+      }
+    });
+  });
+}
+
+document.getElementById('seg-btn-nuevo').addEventListener('click', openNuevoSeguimientoModal);
+
+function openNuevoSeguimientoModal(){
+  const s = seguimientoAlumnoSeleccionado;
+  if(!s) return;
+  const incidenciasAbiertas = INCIDENTS.filter(i=>i.studentId===s.id && (i.estado==='Abierta' || i.estado==='En seguimiento'));
+  const m2 = document.getElementById('modal-content');
+
+  if(incidenciasAbiertas.length === 0){
+    m2.innerHTML = `
+      <div class="modal-head">
+        <div><h3>Nuevo seguimiento</h3><p>${s.nombre} · ${s.grado}${s.grupo?(' '+s.grupo):''}</p></div>
+        <button class="modal-close" id="modal-x">&times;</button>
+      </div>
+      <p style="color:var(--ink-soft);font-size:13.5px;">
+        Este alumno no tiene ninguna incidencia <b>Abierta</b> o <b>En seguimiento</b> en este momento,
+        así que no hay a qué ligar un nuevo seguimiento. Registra primero una incidencia desde
+        "Nueva incidencia" y después podrás darle seguimiento aquí.
+      </p>
+      <div class="form-actions" style="margin-top:16px;">
+        <button class="btn btn-primary" id="seg-cerrar-vacio">Entendido</button>
+      </div>
+    `;
+    document.getElementById('modal-bg').classList.add('show');
+    document.getElementById('modal-x').addEventListener('click', closeModal);
+    document.getElementById('seg-cerrar-vacio').addEventListener('click', closeModal);
+    return;
+  }
+
+  const opcionesIncidencia = incidenciasAbiertas.map(i=>
+    `<option value="${i.id}">${fmtDate(i.fecha)} · ${i.categoria} — ${i.subtipo} (${i.estado})</option>`
+  ).join('');
+  m2.innerHTML = `
+    <div class="modal-head">
+      <div><h3>Nuevo seguimiento</h3><p>${s.nombre} · ${s.grado}${s.grupo?(' '+s.grupo):''}</p></div>
+      <button class="modal-close" id="modal-x">&times;</button>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>Fecha</label>
+        <input type="date" id="seg-fecha">
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <select id="seg-tipo">
+          <option>Compromiso</option>
+          <option>Avance positivo</option>
+          <option>Avance negativo</option>
+          <option>Sin cambios</option>
+          <option>Cierre</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Incidencia relacionada</label>
+      <select id="seg-incidencia">
+        ${opcionesIncidencia}
+      </select>
+    </div>
+    <div class="field">
+      <label>Descripción</label>
+      <textarea id="seg-desc" placeholder="¿Qué se acordó o qué se observó?"></textarea>
+    </div>
+    <div class="field">
+      <label>Registrado por</label>
+      <input type="text" id="seg-registra" list="docentes-list">
+    </div>
+    <div id="seg-error" class="login-error" style="display:none;"></div>
+    <div class="form-actions" style="margin-top:16px;">
+      <button class="btn btn-ghost" id="seg-cancel">Cancelar</button>
+      <button class="btn btn-primary" id="seg-guardar">Guardar</button>
+    </div>
+  `;
+  document.getElementById('seg-fecha').valueAsDate = new Date();
+  if(currentUser.role==='teacher'){
+    const ri = document.getElementById('seg-registra');
+    ri.value = currentUser.teacherName;
+    ri.readOnly = true;
+  }
+  document.getElementById('modal-bg').classList.add('show');
+  document.getElementById('modal-x').addEventListener('click', closeModal);
+  document.getElementById('seg-cancel').addEventListener('click', closeModal);
+
+  document.getElementById('seg-guardar').addEventListener('click', async ()=>{
+    const fecha = document.getElementById('seg-fecha').value;
+    const tipo = document.getElementById('seg-tipo').value;
+    const incidenciaId = document.getElementById('seg-incidencia').value;
+    const desc = document.getElementById('seg-desc').value.trim();
+    const registra = document.getElementById('seg-registra').value.trim();
+    const errBox = document.getElementById('seg-error');
+    errBox.style.display = 'none';
+    if(!fecha || !desc || !registra){
+      errBox.textContent = 'Completa fecha, descripción y quién registra.';
+      errBox.style.display = 'block';
+      return;
+    }
+    if(!incidenciaId){
+      errBox.textContent = 'Selecciona la incidencia a la que corresponde este seguimiento.';
+      errBox.style.display = 'block';
+      return;
+    }
+    const docente = MAP.docenteByNombre[registra];
+    const nuevo = {
+      seguimiento_id: 'seg_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      alumno_id: s.id,
+      incidencia_id: incidenciaId || '',
+      fecha,
+      tipo,
+      descripcion: desc,
+      registrado_por_docente_id: docente ? docente.id : '',
+      registrado_por_texto: docente ? '' : registra
+    };
+    const btn = document.getElementById('seg-guardar');
+    btn.disabled = true; btn.textContent = 'Guardando…';
+    try{
+      await apiCrearSeguimiento(nuevo);
+      SEGUIMIENTOS.unshift({
+        id: nuevo.seguimiento_id, studentId: s.id, incidenciaId: incidenciaId || null,
+        fecha, tipo, descripcion: desc,
+        registradoPor: docente ? docente.nombre : registra,
+        registradoPorDocenteId: docente ? docente.id : null,
+        createdAt: new Date().toISOString()
+      });
+
+      showToast('Seguimiento guardado.');
+      closeModal();
+      renderSeguimientoTimeline();
+
+      // Si el seguimiento está ligado a una incidencia, ajusta su Estado
+      // automáticamente: el primer seguimiento la pasa de "Abierta" a
+      // "En seguimiento"; un seguimiento de tipo "Cierre" la pasa a "Cerrada".
+      // Esto se hace EN SEGUNDO PLANO (sin "await" bloqueante) para no
+      // retrasar el cierre del formulario con una segunda llamada al Sheet.
+      if(incidenciaId){
+        const incidenciaRelacionada = INCIDENTS.find(x=>x.id===incidenciaId);
+        if(incidenciaRelacionada){
+          let nuevoEstado = null;
+          if(tipo === 'Cierre'){
+            nuevoEstado = 'Cerrada';
+          } else if(incidenciaRelacionada.estado === 'Abierta'){
+            nuevoEstado = 'En seguimiento';
+          }
+          if(nuevoEstado && nuevoEstado !== incidenciaRelacionada.estado){
+            apiActualizarEstado(incidenciaRelacionada.id, nuevoEstado)
+              .then(()=>{
+                incidenciaRelacionada.estado = nuevoEstado;
+                updateNavCounts();
+                renderHistorial();
+                renderDashboard();
+                renderSeguimientoTimeline();
+              })
+              .catch(errEstado=>{
+                console.error('No se pudo actualizar el estado automáticamente.', errEstado);
+              });
+          }
+        }
+      }
+    }catch(err){
+      errBox.textContent = err.message || 'No se pudo guardar.';
+      errBox.style.display = 'block';
+    }finally{
+      btn.disabled = false; btn.textContent = 'Guardar';
+    }
   });
 }
 
@@ -1252,16 +2305,8 @@ function openTeacherProfile(id){
   document.getElementById('modal-x').addEventListener('click', closeModal);
 }
 
-/* ---------- Nav counts ---------- */
-function updateNavCounts(){
-  document.getElementById('nav-count-historial').textContent = scopedIncidents().length;
-  document.getElementById('nav-count-alumnos').textContent = scopedStudents().length;
-  document.getElementById('nav-count-docentes').textContent = TEACHERS.length;
-}
 
 /* ---------- Sesión: login de Profesor / Administrador ---------- */
-const ADMIN_PASSCODE = "sauces2026"; // clave simple del lado del cliente; no sustituye una autenticación real
-
 async function loadSession(){
   try{
     const res = await window.storage.get('session-v1', false);
@@ -1279,6 +2324,7 @@ async function clearSession(){
 function showLoginScreen(){
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('app-root').style.display = 'none';
+  document.getElementById('load-status').style.display = 'none';
   document.getElementById('login-role-select').style.display = 'flex';
   document.getElementById('login-teacher-panel').style.display = 'none';
   document.getElementById('login-admin-panel').style.display = 'none';
@@ -1286,6 +2332,8 @@ function showLoginScreen(){
   document.getElementById('login-admin-pass').value = '';
   document.getElementById('login-admin-error').style.display = 'none';
 }
+
+const ADMIN_PASSCODE = "SAUCES2026"; // clave simple del lado del cliente; no sustituye una autenticación real
 
 document.querySelectorAll('.role-card').forEach(btn=>{
   btn.addEventListener('click', ()=>{
@@ -1348,15 +2396,38 @@ function renderSessionBox(){
 }
 
 function applyRoleUI(){
-  document.querySelector('.navbtn[data-view="docentes"]').style.display = currentUser.role==='admin' ? 'flex' : 'none';
+  const adminOnly = currentUser.role==='admin' ? 'flex' : 'none';
+  document.querySelector('.navbtn[data-view="docentes"]').style.display = adminOnly;
+  document.getElementById('dash-f-profesor-wrap').style.display = currentUser.role==='admin' ? '' : 'none';
   renderSessionBox();
   populateGradoSelects();
+  actualizarDashSeccionParaSesion();
   const reportaInput = document.getElementById('new-reporta');
   if(currentUser.role==='teacher'){
     reportaInput.value = currentUser.teacherName;
     reportaInput.readOnly = true;
   } else {
+    reportaInput.value = 'Administrador';
     reportaInput.readOnly = false;
+  }
+}
+
+/** Acota el filtro "Sección" de Reportes según la sesión: un profesor solo
+ *  debe ver las secciones donde realmente da clase (ej. si solo da 3°, solo
+ *  debe ver "Primaria Baja"). Para el administrador se deja el control fino
+ *  (cruzado con Profesor/Grado) a syncDashFiltros(). */
+function actualizarDashSeccionParaSesion(){
+  const selSeccion = document.getElementById('dash-f-seccion');
+  if(!selSeccion) return;
+  if(currentUser.role==='teacher'){
+    const t = TEACHERS.find(x=>x.id===currentUser.teacherId);
+    const seccionesPropias = t ? [...new Set(t.grupos.map(g=>g.seccion))] : [];
+    selSeccion.innerHTML = '<option value="">Todas las secciones</option>' +
+      seccionesPropias.map(s=>`<option>${s}</option>`).join('');
+    selSeccion.value = '';
+  } else {
+    selSeccion.innerHTML = '<option value="">Todas las secciones</option>' +
+      SECCIONES_LIST.map(s=>`<option>${s}</option>`).join('');
   }
 }
 
@@ -1368,23 +2439,45 @@ async function enterApp(){
   document.querySelector('.navbtn[data-view="nuevo"]').classList.add('active');
   document.getElementById('view-nuevo').classList.add('active');
   applyRoleUI();
-  await loadIncidents();
   updateNavCounts();
   renderHistorial();
   renderDashboard();
   renderAlumnos();
-  if(currentUser.role==='admin') renderDocentes();
+  if(currentUser.role==='admin'){
+    renderDocentes();
+  }
 }
 
 /* ---------- Init ---------- */
-(async function boot(){
-  await loadSession();
-  if(currentUser){
-    enterApp();
-  } else {
-    showLoginScreen();
+async function boot(){
+  document.getElementById('load-status').style.display = 'block';
+  document.getElementById('load-spinner').style.display = 'block';
+  document.getElementById('load-status-text').style.display = 'block';
+  document.getElementById('load-status-text').textContent = 'Cargando datos…';
+  document.getElementById('load-status-error').style.display = 'none';
+  document.getElementById('login-role-select').style.display = 'none';
+  try{
+    await fetchAllData();
+    initFormsAndFilters();
+    await loadSession();
+    document.getElementById('load-status').style.display = 'none';
+    if(currentUser){
+      enterApp();
+    } else {
+      showLoginScreen();
+    }
+  }catch(err){
+    console.error(err);
+    document.getElementById('load-spinner').style.display = 'none';
+    document.getElementById('load-status-text').style.display = 'none';
+    document.getElementById('load-status-error').style.display = 'block';
+    document.getElementById('load-status-error-text').textContent =
+      'No se pudo conectar con Google Sheets. Verifica la URL configurada (API_URL al inicio del script) y que la implementación de Apps Script esté activa. Detalle: ' + err.message;
   }
-})();
+}
+
+document.getElementById('btn-retry-load').addEventListener('click', boot);
+boot();
 </script>
 </body>
 </html>
