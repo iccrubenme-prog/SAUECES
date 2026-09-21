@@ -123,6 +123,7 @@
   .pill[data-val="Leve"].sel{background:var(--leve-bg);border-color:var(--leve);color:var(--leve);}
   .pill[data-val="Moderada"].sel{background:var(--moderada-bg);border-color:var(--moderada);color:var(--moderada);}
   .pill[data-val="Grave"].sel{background:var(--grave-bg);border-color:var(--grave);color:var(--grave);}
+  .pill.sel{background:var(--primary-light);border-color:var(--primary);color:var(--primary);}
 
   .autocomplete{position:relative;}
   .ac-results{
@@ -395,6 +396,11 @@
         <b>Profesor</b>
         <span>Ver y reportar solo tus alumnos</span>
       </button>
+      <button class="role-card" data-role="general">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M2 20c0-3.5 2.8-6.3 6.3-6.3S15 16.5 15 20"/><circle cx="17" cy="8" r="2.4"/><path d="M15.5 13.3c2.6.4 4.5 2.7 4.5 5.4"/></svg>
+        <b>General</b>
+        <span>Ver y reportar a cualquier alumno</span>
+      </button>
       <button class="role-card" data-role="admin">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/></svg>
         <b>Administrador</b>
@@ -420,6 +426,7 @@
       <div id="login-admin-error" class="login-error" style="display:none;">Clave incorrecta.</div>
       <button class="btn btn-primary" id="login-admin-submit" style="width:100%;">Entrar</button>
     </div>
+    <p style="text-align:center;font-size:11px;color:var(--ink-faint);margin:24px 0 0;">Hecho por Prisma Data by M&amp;T Consultores</p>
   </div>
 </div>
 
@@ -535,6 +542,14 @@
               <button type="button" class="pill" data-val="Leve">Leve</button>
               <button type="button" class="pill" data-val="Moderada">Moderada</button>
               <button type="button" class="pill" data-val="Grave">Grave</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Conflicto con</label>
+            <div class="pill-group" id="new-conflicto">
+              <button type="button" class="pill" data-val="Autoridad">Autoridad</button>
+              <button type="button" class="pill" data-val="Compañero">Compañero</button>
+              <button type="button" class="pill" data-val="Reglamento">Reglamento</button>
             </div>
           </div>
         </div>
@@ -698,7 +713,19 @@
         </div>
       </div>
       <div class="panel">
-        <h3>Incidencias a lo largo del tiempo</h3>
+        <h3>Incidencias por conflicto con</h3>
+        <div id="chart-conflicto"></div>
+      </div>
+      <div class="panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+          <h3 style="margin:0;">Incidencias a lo largo del tiempo</h3>
+          <div class="pill-group" id="linea-agrupacion">
+            <button type="button" class="pill sel" data-val="dia">Día</button>
+            <button type="button" class="pill" data-val="mes">Mes</button>
+            <button type="button" class="pill" data-val="trimestre">Trimestre</button>
+            <button type="button" class="pill" data-val="anio">Año</button>
+          </div>
+        </div>
         <div id="chart-linea"></div>
       </div>
     </section>
@@ -931,6 +958,7 @@ function filaIncidenciaATextoUI(fila){
     categoria: categoriaNombre,
     subtipo: subNombre,
     gravedad: MAP.gravedadById[Number(fila.gravedad_id)] || '',
+    conflicto: String(fila.conflicto_con || ''),
     descripcion: String(fila.descripcion || ''),
     accionTomada: String(fila.accion_tomada || ''),
     reportadoPor: docente ? docente.nombre : String(fila.reportado_por_texto || ''),
@@ -954,6 +982,7 @@ function incidenciaTextoAFilaId(inc){
     categoria_id: MAP.categoriaByNombre[inc.categoria] || '',
     subcategoria_id: MAP.subcategoriaByNombre[inc.subtipo] || '',
     gravedad_id: MAP.gravedadByNombre[inc.gravedad] || '',
+    conflicto_con: inc.conflicto || '',
     descripcion: inc.descripcion,
     accion_tomada: inc.accionTomada,
     docente_reporta_id: docente ? docente.id : '',
@@ -997,6 +1026,8 @@ let SEGUIMIENTOS = [];
 let currentUser = null; // {role:'admin'} o {role:'teacher', teacherId, teacherName}
 let selectedStudent = null;
 let selectedGravedad = null;
+let selectedConflicto = null;
+let lineaAgrupacion = 'dia'; // 'dia' | 'mes' | 'trimestre' | 'anio', para la gráfica de tendencia en Reportes
 let editingIncidentId = null;
 
 /* ---------- Helpers ---------- */
@@ -1213,6 +1244,14 @@ function initFormsAndFilters(){
 }
 
 document.getElementById('dash-f-seccion').addEventListener('change', renderDashboard);
+document.querySelectorAll('#linea-agrupacion .pill').forEach(p=>{
+  p.addEventListener('click', ()=>{
+    document.querySelectorAll('#linea-agrupacion .pill').forEach(x=>x.classList.remove('sel'));
+    p.classList.add('sel');
+    lineaAgrupacion = p.dataset.val;
+    renderDashboard();
+  });
+});
 document.getElementById('dash-f-grado').addEventListener('change', renderDashboard);
 document.getElementById('dash-f-alumno').addEventListener('input', ()=>{ renderDashboard(); runDashAlumnoAutocomplete(); });
 document.getElementById('dash-f-limpiar').addEventListener('click', ()=>{
@@ -1326,19 +1365,29 @@ document.querySelectorAll('#new-gravedad .pill').forEach(p=>{
   });
 });
 
+document.querySelectorAll('#new-conflicto .pill').forEach(p=>{
+  p.addEventListener('click', ()=>{
+    document.querySelectorAll('#new-conflicto .pill').forEach(x=>x.classList.remove('sel'));
+    p.classList.add('sel');
+    selectedConflicto = p.dataset.val;
+  });
+});
+
 document.getElementById('new-fecha').valueAsDate = new Date();
 
 function limpiarForm(){
   selectedStudent = null; renderSelectedStudent();
   selectedGravedad = null;
   document.querySelectorAll('#new-gravedad .pill').forEach(x=>x.classList.remove('sel'));
+  selectedConflicto = null;
+  document.querySelectorAll('#new-conflicto .pill').forEach(x=>x.classList.remove('sel'));
   document.getElementById('new-fecha').valueAsDate = new Date();
   document.getElementById('new-lugar').selectedIndex = 0;
   newCategoria.selectedIndex = 0;
   populateNewSubtipo();
   document.getElementById('new-desc').value='';
   document.getElementById('new-accion').value='';
-  document.getElementById('new-reporta').value = (currentUser && currentUser.role==='teacher') ? currentUser.teacherName : (currentUser && currentUser.role==='admin' ? 'Administrador' : '');
+  document.getElementById('new-reporta').value = (currentUser && (currentUser.role==='teacher' || currentUser.role==='general')) ? currentUser.teacherName : (currentUser && currentUser.role==='admin' ? 'Administrador' : '');
   document.getElementById('new-estado').selectedIndex = 0;
   document.getElementById('new-seguimiento').checked=false;
   document.getElementById('new-notifico').checked=false;
@@ -1367,6 +1416,7 @@ document.getElementById('btn-guardar').addEventListener('click', async ()=>{
     categoria: newCategoria.value,
     subtipo: newSubtipo.value,
     gravedad: selectedGravedad,
+    conflicto: selectedConflicto || '',
     descripcion: desc,
     accionTomada: document.getElementById('new-accion').value.trim(),
     reportadoPor: reporta,
@@ -1433,6 +1483,7 @@ function renderHistorial(){
         <span class="badge badge-tipo">${i.categoria}</span>
         <span class="badge badge-sub">${i.subtipo}</span>
         <span class="badge badge-${i.gravedad}">${i.gravedad}</span>
+        ${i.conflicto ? `<span class="badge badge-sub">Conflicto: ${i.conflicto}</span>` : ''}
         <span class="badge ${badgeEstadoClass(i.estado)}">${i.estado}</span>
       </div>
       <p class="inc-desc">${i.descripcion.replace(/</g,'&lt;')}</p>
@@ -1446,8 +1497,8 @@ function renderHistorial(){
 document.getElementById('btn-export').addEventListener('click', ()=>{
   const list = filteredIncidents();
   if(list.length===0){ showToast('No hay datos para exportar.'); return; }
-  const headers = ['Fecha','Alumno','Grado','Grupo','Lugar','Categoria','Subclasificacion','Gravedad','Estado','Descripcion','Accion tomada','Reportado por','Requiere seguimiento','Notifico a padres'];
-  const rows = list.map(i=>[i.fecha,i.studentName,i.grado,i.grupo||'',i.lugar,i.categoria,i.subtipo,i.gravedad,i.estado,i.descripcion,i.accionTomada,i.reportadoPor,i.seguimiento?'Si':'No',i.notifico?'Si':'No']);
+  const headers = ['Fecha','Alumno','Grado','Grupo','Lugar','Categoria','Subclasificacion','Gravedad','Conflicto con','Estado','Descripcion','Accion tomada','Reportado por','Requiere seguimiento','Notifico a padres'];
+  const rows = list.map(i=>[i.fecha,i.studentName,i.grado,i.grupo||'',i.lugar,i.categoria,i.subtipo,i.gravedad,i.conflicto||'',i.estado,i.descripcion,i.accionTomada,i.reportadoPor,i.seguimiento?'Si':'No',i.notifico?'Si':'No']);
   const csv = [headers, ...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -1475,6 +1526,7 @@ function openModal(id){
       <span class="badge badge-tipo">${i.categoria}</span>
       <span class="badge badge-sub">${i.subtipo}</span>
       <span class="badge badge-${i.gravedad}">${i.gravedad}</span>
+      ${i.conflicto ? `<span class="badge badge-sub">Conflicto: ${i.conflicto}</span>` : ''}
     </div>
     <div class="kv"><label>Descripción</label><div>${i.descripcion.replace(/</g,'&lt;')}</div></div>
     <div class="kv"><label>Acción tomada</label><div>${(i.accionTomada||'—').replace(/</g,'&lt;')}</div></div>
@@ -1607,6 +1659,7 @@ function exportarIncidenciaPDF(i){
 
   campo('Categoría', `${i.categoria} — ${i.subtipo}`);
   campo('Gravedad', i.gravedad);
+  if(i.conflicto) campo('Conflicto con', i.conflicto);
   campo('Descripción del incidente', i.descripcion);
   campo('Acción tomada por el colegio', i.accionTomada || 'Sin registrar');
   campo('Reportado por', i.reportadoPor);
@@ -1797,20 +1850,93 @@ function renderDashboard(){
     .map(([e,n])=>`<div class="bar-row"><span class="lbl">${e}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxEstado*100)}%;background:${ESTADO_COLOR[e]||'var(--primary)'}"></div></div><span class="n">${n}</span></div>`)
     .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
 
-  // Incidencias a lo largo del tiempo (agrupadas por mes)
-  const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const porMes = {};
+  // Incidencias por "Conflicto con" (campo opcional: Autoridad / Compañero / Reglamento)
+  const porConflicto = {};
+  incidents.forEach(i=>{ if(i.conflicto) porConflicto[i.conflicto] = (porConflicto[i.conflicto]||0)+1; });
+  const conflictosConDatos = Object.entries(porConflicto).sort((a,b)=>b[1]-a[1]);
+  const maxConflicto = Math.max(1, ...Object.values(porConflicto));
+  document.getElementById('chart-conflicto').innerHTML = conflictosConDatos.length ? conflictosConDatos
+    .map(([c,n])=>`<div class="bar-row"><span class="lbl">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxConflicto*100)}%"></div></div><span class="n">${n}</span></div>`)
+    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin datos de "Conflicto con" en estos filtros.</div>';
+
+  // Incidencias a lo largo del tiempo, agrupadas por el periodo elegido con
+  // los botones (Día/Mes/Trimestre/Año). Se rellenan los periodos sin
+  // incidencias con 0 para que la línea muestre la tendencia real.
+  const porPeriodo = {};
   incidents.forEach(i=>{
     if(!i.fecha) return;
-    const mes = i.fecha.slice(0,7);
-    porMes[mes] = (porMes[mes]||0)+1;
+    const key = claveDePeriodo(i.fecha, lineaAgrupacion);
+    porPeriodo[key] = (porPeriodo[key]||0)+1;
   });
-  const mesesOrdenados = Object.keys(porMes).sort();
-  const datosLinea = mesesOrdenados.map(m=>{
-    const [y,mm] = m.split('-');
-    return { label: MESES_CORTOS[parseInt(mm,10)-1] + ' \'' + y.slice(2), value: porMes[m] };
-  });
+  const periodosConDatos = Object.keys(porPeriodo).sort();
+  const datosLinea = periodosConDatos.length
+    ? generarSerieCompleta(periodosConDatos[0], periodosConDatos[periodosConDatos.length-1], lineaAgrupacion, porPeriodo)
+    : [];
   renderLineChart('chart-linea', datosLinea);
+}
+
+const MESES_CORTOS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const toDateKey = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+/** Convierte una fecha "YYYY-MM-DD" en la clave del periodo correspondiente
+ *  según el modo de agrupación elegido (dia/mes/trimestre/anio). */
+function claveDePeriodo(fechaStr, modo){
+  const d = new Date(fechaStr+'T00:00:00');
+  const y = d.getFullYear();
+  if(modo==='dia') return fechaStr;
+  if(modo==='mes') return `${y}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  if(modo==='trimestre') return `${y}-Q${Math.floor(d.getMonth()/3)+1}`;
+  return String(y); // anio
+}
+
+/** Etiqueta legible para mostrar en el eje del periodo. */
+function etiquetaDePeriodo(key, modo){
+  if(modo==='dia'){
+    return new Date(key+'T00:00:00').toLocaleDateString('es-MX',{day:'2-digit',month:'short'});
+  }
+  if(modo==='mes'){
+    const [y,m] = key.split('-');
+    return MESES_CORTOS[parseInt(m,10)-1] + " '" + y.slice(2);
+  }
+  if(modo==='trimestre'){
+    const [y,q] = key.split('-Q');
+    return 'T' + q + " '" + y.slice(2);
+  }
+  return key; // anio
+}
+
+/** Clave del siguiente periodo consecutivo (para rellenar huecos sin datos). */
+function siguientePeriodo(key, modo){
+  if(modo==='dia'){
+    const d = new Date(key+'T00:00:00');
+    d.setDate(d.getDate()+1);
+    return toDateKey(d);
+  }
+  if(modo==='mes'){
+    let [y,m] = key.split('-').map(Number);
+    m++; if(m>12){ m=1; y++; }
+    return `${y}-${String(m).padStart(2,'0')}`;
+  }
+  if(modo==='trimestre'){
+    let [y,q] = key.split('-Q').map(Number);
+    q++; if(q>4){ q=1; y++; }
+    return `${y}-Q${q}`;
+  }
+  return String(parseInt(key,10)+1); // anio
+}
+
+/** Genera la serie completa entre dos periodos (inclusive), con 0 en los
+ *  que no tengan incidencias registradas. */
+function generarSerieCompleta(desde, hasta, modo, porPeriodo){
+  const out = [];
+  let cursor = desde;
+  let guard = 0;
+  while(true){
+    out.push({ label: etiquetaDePeriodo(cursor, modo), value: porPeriodo[cursor] || 0 });
+    if(cursor === hasta || ++guard > 400) break;
+    cursor = siguientePeriodo(cursor, modo);
+  }
+  return out;
 }
 
 /** Dibuja una gráfica de línea simple en SVG dentro del contenedor indicado.
@@ -1908,6 +2034,7 @@ function openStudentProfile(id){
           <span class="badge badge-tipo">${i.categoria}</span>
           <span class="badge badge-sub">${i.subtipo}</span>
           <span class="badge badge-${i.gravedad}">${i.gravedad}</span>
+          ${i.conflicto ? `<span class="badge badge-sub">Conflicto: ${i.conflicto}</span>` : ''}
           <span class="badge ${badgeEstadoClass(i.estado)}">${i.estado}</span>
         </div>
         <p class="inc-desc">${i.descripcion.replace(/</g,'&lt;')}</p>
@@ -2029,6 +2156,7 @@ function renderSeguimientoTimeline(){
             <span class="tl-etiqueta tl-incidente">Incidencia</span>
             <span class="tl-fecha">${fmtDate(ev.fecha)}</span>
             <span class="badge badge-${ev.gravedad}">${ev.gravedad}</span>
+            ${ev.conflicto ? `<span class="badge badge-sub">Conflicto: ${ev.conflicto}</span>` : ''}
             <span class="badge ${badgeEstadoClass(ev.estado)}">${ev.estado}</span>
           </div>
           <p class="tl-desc"><b>${ev.categoria} · ${ev.subtipo}</b><br>${ev.descripcion.replace(/</g,'&lt;')}</p>
@@ -2141,7 +2269,7 @@ function openNuevoSeguimientoModal(){
     </div>
   `;
   document.getElementById('seg-fecha').valueAsDate = new Date();
-  if(currentUser.role==='teacher'){
+  if(currentUser.role==='teacher' || currentUser.role==='general'){
     const ri = document.getElementById('seg-registra');
     ri.value = currentUser.teacherName;
     ri.readOnly = true;
@@ -2335,10 +2463,12 @@ function showLoginScreen(){
 
 const ADMIN_PASSCODE = "SAUCES2026"; // clave simple del lado del cliente; no sustituye una autenticación real
 
+let loginRoleIntent = 'teacher'; // 'teacher' o 'general', según qué tarjeta se haya elegido
 document.querySelectorAll('.role-card').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.getElementById('login-role-select').style.display = 'none';
-    if(btn.dataset.role==='teacher'){
+    if(btn.dataset.role==='teacher' || btn.dataset.role==='general'){
+      loginRoleIntent = btn.dataset.role;
       document.getElementById('login-teacher-panel').style.display = 'block';
       renderLoginTeacherList();
       document.getElementById('login-teacher-search').focus();
@@ -2365,7 +2495,7 @@ function renderLoginTeacherList(){
 async function loginAsTeacher(id){
   const t = TEACHERS.find(x=>x.id===id);
   if(!t) return;
-  currentUser = {role:'teacher', teacherId:t.id, teacherName:t.nombre};
+  currentUser = {role: loginRoleIntent, teacherId:t.id, teacherName:t.nombre};
   await saveSession();
   enterApp();
 }
@@ -2385,9 +2515,14 @@ async function attemptAdminLogin(){
 
 function renderSessionBox(){
   const box = document.getElementById('session-box');
-  const who = currentUser.role==='teacher'
-    ? `<b>${currentUser.teacherName}</b><span>Profesor</span>`
-    : `<b>Administrador</b><span>Acceso completo</span>`;
+  let who;
+  if(currentUser.role==='admin'){
+    who = `<b>Administrador</b><span>Acceso completo</span>`;
+  } else if(currentUser.role==='general'){
+    who = `<b>${currentUser.teacherName}</b><span>General</span>`;
+  } else {
+    who = `<b>${currentUser.teacherName}</b><span>Profesor</span>`;
+  }
   box.innerHTML = `<div class="who">${who}</div><button id="logout-btn" title="Cambiar usuario">Salir</button>`;
   document.getElementById('logout-btn').addEventListener('click', async ()=>{
     await clearSession();
@@ -2397,13 +2532,19 @@ function renderSessionBox(){
 
 function applyRoleUI(){
   const adminOnly = currentUser.role==='admin' ? 'flex' : 'none';
+  const isGeneral = currentUser.role==='general';
   document.querySelector('.navbtn[data-view="docentes"]').style.display = adminOnly;
+  // El rol "General" solo tiene habilitada la sección "Nueva incidencia";
+  // el resto del menú queda oculto para esa sesión.
+  ['historial','dashboard','alumnos','seguimientos'].forEach(v=>{
+    document.querySelector(`.navbtn[data-view="${v}"]`).style.display = isGeneral ? 'none' : 'flex';
+  });
   document.getElementById('dash-f-profesor-wrap').style.display = currentUser.role==='admin' ? '' : 'none';
   renderSessionBox();
   populateGradoSelects();
   actualizarDashSeccionParaSesion();
   const reportaInput = document.getElementById('new-reporta');
-  if(currentUser.role==='teacher'){
+  if(currentUser.role==='teacher' || currentUser.role==='general'){
     reportaInput.value = currentUser.teacherName;
     reportaInput.readOnly = true;
   } else {
