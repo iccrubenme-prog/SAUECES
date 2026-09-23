@@ -191,6 +191,7 @@
   .inc-top .meta{font-size:12px;color:var(--ink-faint);}
   .badge{
     font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.2px;
+    background:var(--surface-2);color:var(--ink-soft); /* valor por defecto para variantes sin color específico (ej. "N/A") */
   }
   .badge-Leve{background:var(--leve-bg);color:var(--leve);}
   .badge-Moderada{background:var(--moderada-bg);color:var(--moderada);}
@@ -234,6 +235,8 @@
   .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:18px;}
   .dash-grid-even{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch;}
   .dash-grid-even .panel{display:flex;flex-direction:column;}
+  .dash-grid-three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch;}
+  .dash-grid-three .panel{display:flex;flex-direction:column;}
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
   .panel h3{margin:0 0 16px;font-size:15px;}
   .bar-row{display:grid;grid-template-columns:150px 1fr 34px;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px;}
@@ -246,6 +249,18 @@
   .ts-row:last-child{border-bottom:none;}
   .ts-row .n{color:var(--ink-soft);}
   .ts-row .c{background:var(--grave-bg);color:var(--grave);font-weight:700;font-size:11.5px;padding:2px 9px;border-radius:20px;}
+
+  /* Filtrado cruzado estilo Power BI: clic en una barra/fila filtra todo el reporte */
+  .filtrable{cursor:pointer;border-radius:8px;padding:4px 6px;margin:0 -6px 6px;transition:background .12s,opacity .12s;}
+  .filtrable:hover{background:var(--primary-light);}
+  .filtrable.bar-sel{background:var(--primary-light);}
+  .filtrable.bar-sel .lbl,.filtrable.bar-sel span:first-child{color:var(--primary);font-weight:700;}
+  .filtrable.bar-dim{opacity:.4;}
+  .ts-row.filtrable{border-radius:8px;padding:9px 8px;margin:0 -8px;border-bottom:1px solid transparent;}
+  .ts-row.filtrable:hover{background:var(--primary-light);}
+  .ts-row.filtrable.bar-sel{background:var(--primary-light);}
+  .ts-row.filtrable.bar-sel span:first-child{color:var(--primary);font-weight:700;}
+  .ts-row.filtrable.bar-dim{opacity:.4;}
 
   /* Students view */
   .stu-controls{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;}
@@ -369,6 +384,7 @@
     .kpis{grid-template-columns:1fr 1fr;}
     .dash-grid{grid-template-columns:1fr;}
     .dash-grid-even{grid-template-columns:1fr;}
+    .dash-grid-three{grid-template-columns:1fr;}
     .row2,.row3{grid-template-columns:1fr;}
   }
 </style>
@@ -538,19 +554,11 @@
           </div>
           <div class="field">
             <label>Gravedad</label>
-            <div class="pill-group" id="new-gravedad">
-              <button type="button" class="pill" data-val="Leve">Leve</button>
-              <button type="button" class="pill" data-val="Moderada">Moderada</button>
-              <button type="button" class="pill" data-val="Grave">Grave</button>
-            </div>
+            <div class="pill-group" id="new-gravedad"></div>
           </div>
           <div class="field">
             <label>Conflicto con</label>
-            <div class="pill-group" id="new-conflicto">
-              <button type="button" class="pill" data-val="Autoridad">Autoridad</button>
-              <button type="button" class="pill" data-val="Compañero">Compañero</button>
-              <button type="button" class="pill" data-val="Reglamento">Reglamento</button>
-            </div>
+            <div class="pill-group" id="new-conflicto"></div>
           </div>
         </div>
 
@@ -702,19 +710,19 @@
           <div id="chart-lugar"></div>
         </div>
       </div>
-      <div class="dash-grid-even">
+      <div class="dash-grid-three">
+        <div class="panel">
+          <h3>Incidencias por estado</h3>
+          <div id="chart-estado"></div>
+        </div>
         <div class="panel">
           <h3>Incidencias por gravedad</h3>
           <div id="chart-gravedad"></div>
         </div>
         <div class="panel">
-          <h3>Incidencias por estado</h3>
-          <div id="chart-estado"></div>
+          <h3>Incidencias por conflicto con</h3>
+          <div id="chart-conflicto"></div>
         </div>
-      </div>
-      <div class="panel">
-        <h3>Incidencias por conflicto con</h3>
-        <div id="chart-conflicto"></div>
       </div>
       <div class="panel">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
@@ -830,28 +838,17 @@ let CATEGORIA_LIST = [];
 // Catálogos que se mantienen fijos en el código (coinciden 1:1 con Dim_Lugares,
 // Dim_Gravedad y Dim_Estados del Sheet). Si agregas/quitas valores en esas hojas,
 // actualiza también estas listas para que los id sigan coincidiendo.
-const LUGARES = [
-  {lugar_id:1, nombre:"Salón de clases"}, {lugar_id:2, nombre:"Patio / Recreo"},
-  {lugar_id:3, nombre:"Comedor"}, {lugar_id:4, nombre:"Pasillos"},
-  {lugar_id:5, nombre:"Educación física / Deportes"}, {lugar_id:6, nombre:"Transporte escolar"},
-  {lugar_id:7, nombre:"Excursión / Salida"}, {lugar_id:8, nombre:"Otro"}
-];
-const GRAVEDADES = [{gravedad_id:1, nombre:"Leve"}, {gravedad_id:2, nombre:"Moderada"}, {gravedad_id:3, nombre:"Grave"}];
-const ESTADOS_CAT = [{estado_id:1, nombre:"Abierta"}, {estado_id:2, nombre:"En seguimiento"}, {estado_id:3, nombre:"Cerrada"}];
+// Catálogos que ahora SÍ se leen del Sheet (Dim_Lugares, Dim_Gravedad,
+// Dim_Estados, Dim_Conflicto) — se llenan en applyData() con lo que llegue
+// de la API. Empiezan vacíos y se recalculan en cada carga/actualización.
+let LUGARES = [];
+let GRAVEDADES = [];
+let ESTADOS_CAT = [];
+let CONFLICTOS = [];
 
 // Mapas id <-> nombre, para traducir entre lo que guarda el Sheet (ids) y lo que
-// usa la interfaz (texto). Se llenan en fetchAllData().
-let MAP = {
-  lugarByNombre: Object.fromEntries(LUGARES.map(l=>[l.nombre, l.lugar_id])),
-  lugarById: Object.fromEntries(LUGARES.map(l=>[l.lugar_id, l.nombre])),
-  gravedadByNombre: Object.fromEntries(GRAVEDADES.map(g=>[g.nombre, g.gravedad_id])),
-  gravedadById: Object.fromEntries(GRAVEDADES.map(g=>[g.gravedad_id, g.nombre])),
-  estadoByNombre: Object.fromEntries(ESTADOS_CAT.map(e=>[e.nombre, e.estado_id])),
-  estadoById: Object.fromEntries(ESTADOS_CAT.map(e=>[e.estado_id, e.nombre])),
-  categoriaByNombre: {}, categoriaById: {},
-  subcategoriaByNombre: {}, subcategoriaById: {}, subcategoriaCategoriaId: {},
-  alumnoById: {}, docenteById: {}, docenteByNombre: {}
-};
+// usa la interfaz (texto). Se llenan en applyData().
+let MAP = {};
 
 /* ---------- Carga inicial: trae todas las tablas del Google Sheet ---------- */
 async function fetchAllData(){
@@ -865,6 +862,12 @@ async function fetchAllData(){
 /** Toma el objeto crudo {alumnos, docentes, docenteGrupo, categorias, subcategorias, incidencias}
  *  y llena STUDENTS/TEACHERS/CATEGORIAS/INCIDENTS/MAP */
 function applyData(d){
+  // Catálogos que ahora vienen del Sheet en vez de estar fijos en el código
+  LUGARES = (d.lugares || []).map(l => ({ lugar_id: Number(l.lugar_id), nombre: String(l.nombre) }));
+  GRAVEDADES = (d.gravedad || []).map(g => ({ gravedad_id: Number(g.gravedad_id), nombre: String(g.nombre) }));
+  ESTADOS_CAT = (d.estados || []).map(e => ({ estado_id: Number(e.estado_id), nombre: String(e.nombre) }));
+  CONFLICTOS = (d.conflicto || []).map(c => ({ conflicto_id: Number(c.conflicto_id), nombre: String(c.nombre) }));
+
   MAP = {
     lugarByNombre: Object.fromEntries(LUGARES.map(l=>[l.nombre, l.lugar_id])),
     lugarById: Object.fromEntries(LUGARES.map(l=>[l.lugar_id, l.nombre])),
@@ -872,6 +875,8 @@ function applyData(d){
     gravedadById: Object.fromEntries(GRAVEDADES.map(g=>[g.gravedad_id, g.nombre])),
     estadoByNombre: Object.fromEntries(ESTADOS_CAT.map(e=>[e.nombre, e.estado_id])),
     estadoById: Object.fromEntries(ESTADOS_CAT.map(e=>[e.estado_id, e.nombre])),
+    conflictoByNombre: Object.fromEntries(CONFLICTOS.map(c=>[c.nombre, c.conflicto_id])),
+    conflictoById: Object.fromEntries(CONFLICTOS.map(c=>[c.conflicto_id, c.nombre])),
     categoriaByNombre: {}, categoriaById: {},
     subcategoriaByNombre: {}, subcategoriaById: {}, subcategoriaCategoriaId: {},
     alumnoById: {}, docenteById: {}, docenteByNombre: {}
@@ -1228,6 +1233,24 @@ function populateLugarYEstado(){
   estadoSel.innerHTML = ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
   const fEstado = document.getElementById('f-estado');
   fEstado.innerHTML = '<option value="">Todos</option>' + ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
+  populatePillGroup('new-gravedad', GRAVEDADES, v=>{ selectedGravedad = v; });
+  populatePillGroup('new-conflicto', CONFLICTOS, v=>{ selectedConflicto = v; });
+}
+
+/** Arma un grupo de botones tipo "pill" (Gravedad, Conflicto con, etc.) a
+ *  partir de una lista [{nombre, ...}] traída del Sheet, y conecta el clic
+ *  para que solo uno quede seleccionado a la vez. onSelect(nombre) se llama
+ *  cada vez que el usuario elige una opción. */
+function populatePillGroup(containerId, lista, onSelect){
+  const box = document.getElementById(containerId);
+  box.innerHTML = lista.map(item=>`<button type="button" class="pill" data-val="${item.nombre}">${item.nombre}</button>`).join('');
+  box.querySelectorAll('.pill').forEach(p=>{
+    p.addEventListener('click', ()=>{
+      box.querySelectorAll('.pill').forEach(x=>x.classList.remove('sel'));
+      p.classList.add('sel');
+      onSelect(p.dataset.val);
+    });
+  });
 }
 
 /* Agrupa todas las inicializaciones que dependen de los datos cargados desde el Sheet */
@@ -1259,6 +1282,7 @@ document.getElementById('dash-f-limpiar').addEventListener('click', ()=>{
   document.getElementById('dash-f-alumno').value = '';
   document.getElementById('dash-f-seccion').value = '';
   document.getElementById('dash-f-grado').value = '';
+  Object.keys(dashClickFilters).forEach(k=> dashClickFilters[k] = null);
   renderDashboard();
 });
 
@@ -1356,22 +1380,6 @@ function renderSelectedStudent(){
     selectedStudent = null; renderSelectedStudent();
   });
 }
-
-document.querySelectorAll('#new-gravedad .pill').forEach(p=>{
-  p.addEventListener('click', ()=>{
-    document.querySelectorAll('#new-gravedad .pill').forEach(x=>x.classList.remove('sel'));
-    p.classList.add('sel');
-    selectedGravedad = p.dataset.val;
-  });
-});
-
-document.querySelectorAll('#new-conflicto .pill').forEach(p=>{
-  p.addEventListener('click', ()=>{
-    document.querySelectorAll('#new-conflicto .pill').forEach(x=>x.classList.remove('sel'));
-    p.classList.add('sel');
-    selectedConflicto = p.dataset.val;
-  });
-});
 
 document.getElementById('new-fecha').valueAsDate = new Date();
 
@@ -1732,6 +1740,83 @@ function syncDashFiltros(){
 }
 
 /* ---------- Dashboard ---------- */
+/** Filtros que se activan al dar clic en una barra/fila de las gráficas de
+ *  Reportes (estilo Power BI): categoría, subclasificación, lugar, gravedad,
+ *  estado y conflicto. Grado, Alumno y Profesor reutilizan sus propios
+ *  selects/buscador existentes en vez de tener aquí una entrada aparte. */
+let dashClickFilters = { categoria:null, subtipo:null, lugar:null, gravedad:null, estado:null, conflicto:null };
+
+/** Activa/desactiva (toggle) un filtro por clic y vuelve a dibujar todo el
+ *  reporte con él aplicado — dar clic de nuevo en la misma barra lo quita. */
+function toggleDashClickFilter(campo, valor){
+  dashClickFilters[campo] = (dashClickFilters[campo] === valor) ? null : valor;
+  renderDashboard();
+}
+
+/** Dibuja una gráfica de barras "cruzable": al dar clic en una barra filtra
+ *  TODO el reporte por ese valor. La barra activa se resalta y las demás de
+ *  esa misma gráfica se atenúan, para ver de un vistazo qué filtro está
+ *  vigente. `porValor` es un objeto {etiqueta: cantidad}; `campo` es la
+ *  llave de dashClickFilters que le corresponde. */
+function renderFiltrableBarChart(containerId, porValor, campo, opts={}){
+  const el = document.getElementById(containerId);
+  let entries = Object.entries(porValor);
+  if(!entries.length){
+    el.innerHTML = opts.vacioMsg || '<div style="color:var(--ink-faint);font-size:13px;">Sin datos con estos filtros.</div>';
+    return;
+  }
+  if(opts.ordenar !== false) entries = entries.sort((a,b)=>b[1]-a[1]);
+  if(opts.limite) entries = entries.slice(0, opts.limite);
+  const max = Math.max(1, ...entries.map(([,n])=>n));
+  const activo = dashClickFilters[campo];
+  el.innerHTML = entries.map(([k,n])=>{
+    const sel = activo === k;
+    const clases = ['bar-row','filtrable'];
+    if(sel) clases.push('bar-sel'); else if(activo) clases.push('bar-dim');
+    const color = (opts.colores && opts.colores[k]) || 'var(--primary)';
+    return `<div class="${clases.join(' ')}" data-campo="${campo}" data-valor="${String(k).replace(/"/g,'&quot;')}">
+      <span class="lbl">${k}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(n/max*100)}%;background:${color}"></div></div>
+      <span class="n">${n}</span>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.bar-row.filtrable').forEach(row=>{
+    row.addEventListener('click', ()=> toggleDashClickFilter(row.dataset.campo, row.dataset.valor));
+  });
+}
+
+/** Dibuja la gráfica de "Incidencias por grado", reutilizando el propio
+ *  select "Grado" de los filtros como estado de selección (en vez de tener
+ *  un filtro de clic aparte): dar clic en una barra pone/quita ese grado en
+ *  el select y vuelve a dibujar todo el reporte. */
+function renderGradoChart(porGrado, gradosEnFiltrado){
+  const el = document.getElementById('chart-grado');
+  if(!gradosEnFiltrado.length){
+    el.innerHTML = '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+    return;
+  }
+  const max = Math.max(1, ...Object.values(porGrado));
+  const gradoSel = document.getElementById('dash-f-grado');
+  const activo = gradoSel.value;
+  el.innerHTML = gradosEnFiltrado.map(g=>{
+    const n = porGrado[g];
+    const sel = activo === g;
+    const clases = ['bar-row','filtrable'];
+    if(sel) clases.push('bar-sel'); else if(activo) clases.push('bar-dim');
+    return `<div class="${clases.join(' ')}" data-valor="${g}">
+      <span class="lbl">${g}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${(n/max*100)}%"></div></div>
+      <span class="n">${n}</span>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.bar-row.filtrable').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      gradoSel.value = (gradoSel.value === row.dataset.valor) ? '' : row.dataset.valor;
+      renderDashboard();
+    });
+  });
+}
+
 function renderDashboard(){
   syncDashFiltros();
   let incidents = scopedIncidents();
@@ -1747,6 +1832,13 @@ function renderDashboard(){
   if(fAlumno) incidents = incidents.filter(i=>i.studentName.toLowerCase().includes(fAlumno));
   if(fSeccion) incidents = incidents.filter(i=>GRADO_SECCION[i.grado]===fSeccion);
   if(fGrado) incidents = incidents.filter(i=>i.grado===fGrado);
+  // Filtros activados por clic en alguna gráfica (estilo Power BI)
+  if(dashClickFilters.categoria) incidents = incidents.filter(i=>i.categoria===dashClickFilters.categoria);
+  if(dashClickFilters.subtipo) incidents = incidents.filter(i=>i.subtipo===dashClickFilters.subtipo);
+  if(dashClickFilters.lugar) incidents = incidents.filter(i=>i.lugar===dashClickFilters.lugar);
+  if(dashClickFilters.gravedad) incidents = incidents.filter(i=>i.gravedad===dashClickFilters.gravedad);
+  if(dashClickFilters.estado) incidents = incidents.filter(i=>i.estado===dashClickFilters.estado);
+  if(dashClickFilters.conflicto) incidents = incidents.filter(i=>i.conflicto===dashClickFilters.conflicto);
 
   const total = incidents.length;
   const abiertas = incidents.filter(i=>i.estado!=='Cerrada').length;
@@ -1761,19 +1853,14 @@ function renderDashboard(){
   const porCategoria = {};
   CATEGORIA_LIST.forEach(c=>porCategoria[c]=0);
   incidents.forEach(i=>porCategoria[i.categoria]=(porCategoria[i.categoria]||0)+1);
-  const maxCategoria = Math.max(1, ...Object.values(porCategoria));
-  document.getElementById('chart-tipo').innerHTML = Object.entries(porCategoria)
-    .sort((a,b)=>b[1]-a[1])
-    .map(([t,n])=>`<div class="bar-row"><span class="lbl">${t}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxCategoria*100)}%"></div></div><span class="n">${n}</span></div>`)
-    .join('');
+  renderFiltrableBarChart('chart-tipo', porCategoria, 'categoria');
 
   const porSubtipo = {};
   incidents.forEach(i=>porSubtipo[i.subtipo]=(porSubtipo[i.subtipo]||0)+1);
-  const topSubtipos = Object.entries(porSubtipo).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const maxSubtipo = Math.max(1, ...topSubtipos.map(x=>x[1]));
-  document.getElementById('chart-subtipo').innerHTML = topSubtipos.length ? topSubtipos
-    .map(([t,n])=>`<div class="bar-row"><span class="lbl">${t}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxSubtipo*100)}%"></div></div><span class="n">${n}</span></div>`)
-    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Aún no hay incidencias registradas.</div>';
+  renderFiltrableBarChart('chart-subtipo', porSubtipo, 'subtipo', {
+    limite: 8,
+    vacioMsg: '<div style="color:var(--ink-faint);font-size:13px;">Aún no hay incidencias registradas.</div>'
+  });
 
   const porGrado = {};
   // Los grados que aparece la gráfica salen directamente de las incidencias
@@ -1784,10 +1871,7 @@ function renderDashboard(){
     .sort((a,b)=>GRADE_ORDER.indexOf(a)-GRADE_ORDER.indexOf(b));
   gradosEnFiltrado.forEach(g=>porGrado[g]=0);
   incidents.forEach(i=>{ if(porGrado.hasOwnProperty(i.grado)) porGrado[i.grado]++; });
-  const maxGrado = Math.max(1, ...Object.values(porGrado));
-  document.getElementById('chart-grado').innerHTML = gradosEnFiltrado.length ? Object.entries(porGrado)
-    .map(([g,n])=>`<div class="bar-row"><span class="lbl">${g}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxGrado*100)}%"></div></div><span class="n">${n}</span></div>`)
-    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+  renderGradoChart(porGrado, gradosEnFiltrado);
 
   const byStudent = {};
   incidents.forEach(i=>{
@@ -1795,9 +1879,16 @@ function renderDashboard(){
     byStudent[i.studentId].count++;
   });
   const top = Object.values(byStudent).sort((a,b)=>b.count-a.count).slice(0,6);
+  const alumnoInputEl = document.getElementById('dash-f-alumno');
   document.getElementById('top-students').innerHTML = top.length ? top.map(s=>
-    `<div class="ts-row"><span>${s.name} <span class="n">· ${s.grado}${s.grupo?(' '+s.grupo):''}</span></span><span class="c">${s.count}</span></div>`
+    `<div class="ts-row filtrable ${alumnoInputEl.value===s.name?'bar-sel':(alumnoInputEl.value?'bar-dim':'')}" data-nombre="${s.name.replace(/"/g,'&quot;')}"><span>${s.name} <span class="n">· ${s.grado}${s.grupo?(' '+s.grupo):''}</span></span><span class="c">${s.count}</span></div>`
   ).join('') : '<div style="color:var(--ink-faint);font-size:13px;padding:10px 0;">Aún no hay incidencias registradas.</div>';
+  document.getElementById('top-students').querySelectorAll('.ts-row.filtrable').forEach(row=>{
+    row.addEventListener('click', ()=>{
+      alumnoInputEl.value = (alumnoInputEl.value === row.dataset.nombre) ? '' : row.dataset.nombre;
+      renderDashboard();
+    });
+  });
 
   // Profesores con más incidencias (solo tiene sentido mostrarlo al administrador)
   const panelTeachers = document.getElementById('panel-top-teachers');
@@ -1809,13 +1900,24 @@ function renderDashboard(){
     incidents.forEach(i=>{
       const key = i.reportadoPorDocenteId != null ? ('id:'+i.reportadoPorDocenteId) : ('txt:'+i.reportadoPor);
       const nombre = i.reportadoPor || 'Sin especificar';
-      byTeacher[key] = byTeacher[key] || {name:nombre, count:0};
+      byTeacher[key] = byTeacher[key] || {name:nombre, count:0, docenteId:i.reportadoPorDocenteId};
       byTeacher[key].count++;
     });
     const topT = Object.values(byTeacher).sort((a,b)=>b.count-a.count).slice(0,6);
-    document.getElementById('top-teachers').innerHTML = topT.length ? topT.map(t=>
-      `<div class="ts-row"><span>${t.name}</span><span class="c">${t.count}</span></div>`
-    ).join('') : '<div style="color:var(--ink-faint);font-size:13px;padding:10px 0;">Aún no hay incidencias registradas.</div>';
+    const profesorSelEl = document.getElementById('dash-f-profesor');
+    document.getElementById('top-teachers').innerHTML = topT.length ? topT.map(t=>{
+      const clicable = t.docenteId != null;
+      const valId = clicable ? String(t.docenteId) : '';
+      const sel = clicable && profesorSelEl.value === valId;
+      const dim = clicable && profesorSelEl.value && !sel;
+      return `<div class="ts-row ${clicable?'filtrable':''} ${sel?'bar-sel':''} ${dim?'bar-dim':''}" ${clicable?`data-docente-id="${valId}"`:''}><span>${t.name}</span><span class="c">${t.count}</span></div>`;
+    }).join('') : '<div style="color:var(--ink-faint);font-size:13px;padding:10px 0;">Aún no hay incidencias registradas.</div>';
+    document.getElementById('top-teachers').querySelectorAll('.ts-row.filtrable').forEach(row=>{
+      row.addEventListener('click', ()=>{
+        profesorSelEl.value = (profesorSelEl.value === row.dataset.docenteId) ? '' : row.dataset.docenteId;
+        renderDashboard();
+      });
+    });
   } else {
     panelTeachers.style.display = 'none';
     panelStudents.style.gridColumn = '1 / -1';
@@ -1824,40 +1926,29 @@ function renderDashboard(){
   // Incidencias por lugar
   const porLugar = {};
   incidents.forEach(i=>{ if(i.lugar) porLugar[i.lugar] = (porLugar[i.lugar]||0)+1; });
-  const lugaresConDatos = Object.entries(porLugar).sort((a,b)=>b[1]-a[1]);
-  const maxLugar = Math.max(1, ...Object.values(porLugar));
-  document.getElementById('chart-lugar').innerHTML = lugaresConDatos.length ? lugaresConDatos
-    .map(([l,n])=>`<div class="bar-row"><span class="lbl">${l}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxLugar*100)}%"></div></div><span class="n">${n}</span></div>`)
-    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+  renderFiltrableBarChart('chart-lugar', porLugar, 'lugar');
 
   // Incidencias por gravedad (con el mismo color que ya usan las etiquetas Leve/Moderada/Grave)
-  const GRAVEDAD_COLOR = {'Leve':'var(--leve)','Moderada':'var(--moderada)','Grave':'var(--grave)'};
+  const GRAVEDAD_COLOR = {'Leve':'var(--leve)','Moderada':'var(--moderada)','Grave':'var(--grave)','N/A':'var(--ink-faint)'};
   const porGravedad = {};
   GRAVEDADES.forEach(g=>porGravedad[g.nombre]=0);
   incidents.forEach(i=>{ if(porGravedad.hasOwnProperty(i.gravedad)) porGravedad[i.gravedad]++; });
-  const maxGravedad = Math.max(1, ...Object.values(porGravedad));
-  document.getElementById('chart-gravedad').innerHTML = incidents.length ? Object.entries(porGravedad)
-    .map(([g,n])=>`<div class="bar-row"><span class="lbl">${g}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxGravedad*100)}%;background:${GRAVEDAD_COLOR[g]||'var(--primary)'}"></div></div><span class="n">${n}</span></div>`)
-    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+  renderFiltrableBarChart('chart-gravedad', porGravedad, 'gravedad', { ordenar:false, colores:GRAVEDAD_COLOR });
 
   // Incidencias por estado (mismo color que las etiquetas Abierta/En seguimiento/Cerrada)
   const ESTADO_COLOR = {'Abierta':'var(--grave)','En seguimiento':'var(--moderada)','Cerrada':'var(--leve)'};
   const porEstado = {};
   ESTADOS_CAT.forEach(e=>porEstado[e.nombre]=0);
   incidents.forEach(i=>{ if(porEstado.hasOwnProperty(i.estado)) porEstado[i.estado]++; });
-  const maxEstado = Math.max(1, ...Object.values(porEstado));
-  document.getElementById('chart-estado').innerHTML = incidents.length ? Object.entries(porEstado)
-    .map(([e,n])=>`<div class="bar-row"><span class="lbl">${e}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxEstado*100)}%;background:${ESTADO_COLOR[e]||'var(--primary)'}"></div></div><span class="n">${n}</span></div>`)
-    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin incidencias con estos filtros.</div>';
+  renderFiltrableBarChart('chart-estado', porEstado, 'estado', { ordenar:false, colores:ESTADO_COLOR });
 
-  // Incidencias por "Conflicto con" (campo opcional: Autoridad / Compañero / Reglamento)
+  // Incidencias por "Conflicto con" (lista completa desde Dim_Conflicto, igual que Gravedad/Estado)
   const porConflicto = {};
-  incidents.forEach(i=>{ if(i.conflicto) porConflicto[i.conflicto] = (porConflicto[i.conflicto]||0)+1; });
-  const conflictosConDatos = Object.entries(porConflicto).sort((a,b)=>b[1]-a[1]);
-  const maxConflicto = Math.max(1, ...Object.values(porConflicto));
-  document.getElementById('chart-conflicto').innerHTML = conflictosConDatos.length ? conflictosConDatos
-    .map(([c,n])=>`<div class="bar-row"><span class="lbl">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${(n/maxConflicto*100)}%"></div></div><span class="n">${n}</span></div>`)
-    .join('') : '<div style="color:var(--ink-faint);font-size:13px;">Sin datos de "Conflicto con" en estos filtros.</div>';
+  CONFLICTOS.forEach(c=>porConflicto[c.nombre]=0);
+  incidents.forEach(i=>{ if(i.conflicto && porConflicto.hasOwnProperty(i.conflicto)) porConflicto[i.conflicto]++; });
+  renderFiltrableBarChart('chart-conflicto', porConflicto, 'conflicto', {
+    vacioMsg: '<div style="color:var(--ink-faint);font-size:13px;">Sin datos de "Conflicto con" en estos filtros.</div>'
+  });
 
   // Incidencias a lo largo del tiempo, agrupadas por el periodo elegido con
   // los botones (Día/Mes/Trimestre/Año). Se rellenan los periodos sin
