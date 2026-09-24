@@ -235,8 +235,6 @@
   .dash-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;margin-bottom:18px;}
   .dash-grid-even{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch;}
   .dash-grid-even .panel{display:flex;flex-direction:column;}
-  .dash-grid-three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch;}
-  .dash-grid-three .panel{display:flex;flex-direction:column;}
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;}
   .panel h3{margin:0 0 16px;font-size:15px;}
   .bar-row{display:grid;grid-template-columns:150px 1fr 34px;align-items:center;gap:10px;margin-bottom:10px;font-size:12.5px;}
@@ -384,7 +382,6 @@
     .kpis{grid-template-columns:1fr 1fr;}
     .dash-grid{grid-template-columns:1fr;}
     .dash-grid-even{grid-template-columns:1fr;}
-    .dash-grid-three{grid-template-columns:1fr;}
     .row2,.row3{grid-template-columns:1fr;}
   }
 </style>
@@ -560,6 +557,10 @@
             <label>Conflicto con</label>
             <div class="pill-group" id="new-conflicto"></div>
           </div>
+          <div class="field">
+            <label>Canalización al Psicopedagógico</label>
+            <div class="pill-group" id="new-canalizacion"></div>
+          </div>
         </div>
 
         <div class="form-section">
@@ -710,7 +711,7 @@
           <div id="chart-lugar"></div>
         </div>
       </div>
-      <div class="dash-grid-three">
+      <div class="dash-grid-even">
         <div class="panel">
           <h3>Incidencias por estado</h3>
           <div id="chart-estado"></div>
@@ -719,9 +720,15 @@
           <h3>Incidencias por gravedad</h3>
           <div id="chart-gravedad"></div>
         </div>
+      </div>
+      <div class="dash-grid-even">
         <div class="panel">
           <h3>Incidencias por conflicto con</h3>
           <div id="chart-conflicto"></div>
+        </div>
+        <div class="panel">
+          <h3>Canalización al Psicopedagógico</h3>
+          <div id="chart-canalizacion"></div>
         </div>
       </div>
       <div class="panel">
@@ -845,6 +852,7 @@ let LUGARES = [];
 let GRAVEDADES = [];
 let ESTADOS_CAT = [];
 let CONFLICTOS = [];
+let CANALIZACIONES = [];
 
 // Mapas id <-> nombre, para traducir entre lo que guarda el Sheet (ids) y lo que
 // usa la interfaz (texto). Se llenan en applyData().
@@ -867,6 +875,7 @@ function applyData(d){
   GRAVEDADES = (d.gravedad || []).map(g => ({ gravedad_id: Number(g.gravedad_id), nombre: String(g.nombre) }));
   ESTADOS_CAT = (d.estados || []).map(e => ({ estado_id: Number(e.estado_id), nombre: String(e.nombre) }));
   CONFLICTOS = (d.conflicto || []).map(c => ({ conflicto_id: Number(c.conflicto_id), nombre: String(c.nombre) }));
+  CANALIZACIONES = (d.canalizacion || []).map(c => ({ canalizacion_id: Number(c.canalizacion_id), nombre: String(c.nombre) }));
 
   MAP = {
     lugarByNombre: Object.fromEntries(LUGARES.map(l=>[l.nombre, l.lugar_id])),
@@ -877,6 +886,8 @@ function applyData(d){
     estadoById: Object.fromEntries(ESTADOS_CAT.map(e=>[e.estado_id, e.nombre])),
     conflictoByNombre: Object.fromEntries(CONFLICTOS.map(c=>[c.nombre, c.conflicto_id])),
     conflictoById: Object.fromEntries(CONFLICTOS.map(c=>[c.conflicto_id, c.nombre])),
+    canalizacionByNombre: Object.fromEntries(CANALIZACIONES.map(c=>[c.nombre, c.canalizacion_id])),
+    canalizacionById: Object.fromEntries(CANALIZACIONES.map(c=>[c.canalizacion_id, c.nombre])),
     categoriaByNombre: {}, categoriaById: {},
     subcategoriaByNombre: {}, subcategoriaById: {}, subcategoriaCategoriaId: {},
     alumnoById: {}, docenteById: {}, docenteByNombre: {}
@@ -964,6 +975,7 @@ function filaIncidenciaATextoUI(fila){
     subtipo: subNombre,
     gravedad: MAP.gravedadById[Number(fila.gravedad_id)] || '',
     conflicto: String(fila.conflicto_con || ''),
+    canalizacion: String(fila.canalizacion || ''),
     descripcion: String(fila.descripcion || ''),
     accionTomada: String(fila.accion_tomada || ''),
     reportadoPor: docente ? docente.nombre : String(fila.reportado_por_texto || ''),
@@ -988,6 +1000,7 @@ function incidenciaTextoAFilaId(inc){
     subcategoria_id: MAP.subcategoriaByNombre[inc.subtipo] || '',
     gravedad_id: MAP.gravedadByNombre[inc.gravedad] || '',
     conflicto_con: inc.conflicto || '',
+    canalizacion: inc.canalizacion || '',
     descripcion: inc.descripcion,
     accion_tomada: inc.accionTomada,
     docente_reporta_id: docente ? docente.id : '',
@@ -1032,6 +1045,7 @@ let currentUser = null; // {role:'admin'} o {role:'teacher', teacherId, teacherN
 let selectedStudent = null;
 let selectedGravedad = null;
 let selectedConflicto = null;
+let selectedCanalizacion = null;
 let lineaAgrupacion = 'dia'; // 'dia' | 'mes' | 'trimestre' | 'anio', para la gráfica de tendencia en Reportes
 let editingIncidentId = null;
 
@@ -1235,6 +1249,7 @@ function populateLugarYEstado(){
   fEstado.innerHTML = '<option value="">Todos</option>' + ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
   populatePillGroup('new-gravedad', GRAVEDADES, v=>{ selectedGravedad = v; });
   populatePillGroup('new-conflicto', CONFLICTOS, v=>{ selectedConflicto = v; });
+  populatePillGroup('new-canalizacion', CANALIZACIONES, v=>{ selectedCanalizacion = v; });
 }
 
 /** Arma un grupo de botones tipo "pill" (Gravedad, Conflicto con, etc.) a
@@ -1389,6 +1404,8 @@ function limpiarForm(){
   document.querySelectorAll('#new-gravedad .pill').forEach(x=>x.classList.remove('sel'));
   selectedConflicto = null;
   document.querySelectorAll('#new-conflicto .pill').forEach(x=>x.classList.remove('sel'));
+  selectedCanalizacion = null;
+  document.querySelectorAll('#new-canalizacion .pill').forEach(x=>x.classList.remove('sel'));
   document.getElementById('new-fecha').valueAsDate = new Date();
   document.getElementById('new-lugar').selectedIndex = 0;
   newCategoria.selectedIndex = 0;
@@ -1425,6 +1442,7 @@ document.getElementById('btn-guardar').addEventListener('click', async ()=>{
     subtipo: newSubtipo.value,
     gravedad: selectedGravedad,
     conflicto: selectedConflicto || '',
+    canalizacion: selectedCanalizacion || '',
     descripcion: desc,
     accionTomada: document.getElementById('new-accion').value.trim(),
     reportadoPor: reporta,
@@ -1492,6 +1510,7 @@ function renderHistorial(){
         <span class="badge badge-sub">${i.subtipo}</span>
         <span class="badge badge-${i.gravedad}">${i.gravedad}</span>
         ${i.conflicto ? `<span class="badge badge-sub">Conflicto: ${i.conflicto}</span>` : ''}
+        ${i.canalizacion ? `<span class="badge badge-sub">Canalización: ${i.canalizacion}</span>` : ''}
         <span class="badge ${badgeEstadoClass(i.estado)}">${i.estado}</span>
       </div>
       <p class="inc-desc">${i.descripcion.replace(/</g,'&lt;')}</p>
@@ -1505,8 +1524,8 @@ function renderHistorial(){
 document.getElementById('btn-export').addEventListener('click', ()=>{
   const list = filteredIncidents();
   if(list.length===0){ showToast('No hay datos para exportar.'); return; }
-  const headers = ['Fecha','Alumno','Grado','Grupo','Lugar','Categoria','Subclasificacion','Gravedad','Conflicto con','Estado','Descripcion','Accion tomada','Reportado por','Requiere seguimiento','Notifico a padres'];
-  const rows = list.map(i=>[i.fecha,i.studentName,i.grado,i.grupo||'',i.lugar,i.categoria,i.subtipo,i.gravedad,i.conflicto||'',i.estado,i.descripcion,i.accionTomada,i.reportadoPor,i.seguimiento?'Si':'No',i.notifico?'Si':'No']);
+  const headers = ['Fecha','Alumno','Grado','Grupo','Lugar','Categoria','Subclasificacion','Gravedad','Conflicto con','Canalizacion Psicopedagogico','Estado','Descripcion','Accion tomada','Reportado por','Requiere seguimiento','Notifico a padres'];
+  const rows = list.map(i=>[i.fecha,i.studentName,i.grado,i.grupo||'',i.lugar,i.categoria,i.subtipo,i.gravedad,i.conflicto||'',i.canalizacion||'',i.estado,i.descripcion,i.accionTomada,i.reportadoPor,i.seguimiento?'Si':'No',i.notifico?'Si':'No']);
   const csv = [headers, ...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
   const blob = new Blob(['\ufeff'+csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -1535,6 +1554,7 @@ function openModal(id){
       <span class="badge badge-sub">${i.subtipo}</span>
       <span class="badge badge-${i.gravedad}">${i.gravedad}</span>
       ${i.conflicto ? `<span class="badge badge-sub">Conflicto: ${i.conflicto}</span>` : ''}
+        ${i.canalizacion ? `<span class="badge badge-sub">Canalización: ${i.canalizacion}</span>` : ''}
     </div>
     <div class="kv"><label>Descripción</label><div>${i.descripcion.replace(/</g,'&lt;')}</div></div>
     <div class="kv"><label>Acción tomada</label><div>${(i.accionTomada||'—').replace(/</g,'&lt;')}</div></div>
@@ -1668,6 +1688,7 @@ function exportarIncidenciaPDF(i){
   campo('Categoría', `${i.categoria} — ${i.subtipo}`);
   campo('Gravedad', i.gravedad);
   if(i.conflicto) campo('Conflicto con', i.conflicto);
+  if(i.canalizacion) campo('Canalización al Psicopedagógico', i.canalizacion);
   campo('Descripción del incidente', i.descripcion);
   campo('Acción tomada por el colegio', i.accionTomada || 'Sin registrar');
   campo('Reportado por', i.reportadoPor);
@@ -1744,7 +1765,7 @@ function syncDashFiltros(){
  *  Reportes (estilo Power BI): categoría, subclasificación, lugar, gravedad,
  *  estado y conflicto. Grado, Alumno y Profesor reutilizan sus propios
  *  selects/buscador existentes en vez de tener aquí una entrada aparte. */
-let dashClickFilters = { categoria:null, subtipo:null, lugar:null, gravedad:null, estado:null, conflicto:null };
+let dashClickFilters = { categoria:null, subtipo:null, lugar:null, gravedad:null, estado:null, conflicto:null, canalizacion:null };
 
 /** Activa/desactiva (toggle) un filtro por clic y vuelve a dibujar todo el
  *  reporte con él aplicado — dar clic de nuevo en la misma barra lo quita. */
@@ -1839,6 +1860,7 @@ function renderDashboard(){
   if(dashClickFilters.gravedad) incidents = incidents.filter(i=>i.gravedad===dashClickFilters.gravedad);
   if(dashClickFilters.estado) incidents = incidents.filter(i=>i.estado===dashClickFilters.estado);
   if(dashClickFilters.conflicto) incidents = incidents.filter(i=>i.conflicto===dashClickFilters.conflicto);
+  if(dashClickFilters.canalizacion) incidents = incidents.filter(i=>i.canalizacion===dashClickFilters.canalizacion);
 
   const total = incidents.length;
   const abiertas = incidents.filter(i=>i.estado!=='Cerrada').length;
@@ -1948,6 +1970,15 @@ function renderDashboard(){
   incidents.forEach(i=>{ if(i.conflicto && porConflicto.hasOwnProperty(i.conflicto)) porConflicto[i.conflicto]++; });
   renderFiltrableBarChart('chart-conflicto', porConflicto, 'conflicto', {
     vacioMsg: '<div style="color:var(--ink-faint);font-size:13px;">Sin datos de "Conflicto con" en estos filtros.</div>'
+  });
+
+  // Canalización al Psicopedagógico (lista completa desde Dim_Canalizacion)
+  const porCanalizacion = {};
+  CANALIZACIONES.forEach(c=>porCanalizacion[c.nombre]=0);
+  incidents.forEach(i=>{ if(i.canalizacion && porCanalizacion.hasOwnProperty(i.canalizacion)) porCanalizacion[i.canalizacion]++; });
+  renderFiltrableBarChart('chart-canalizacion', porCanalizacion, 'canalizacion', {
+    ordenar:false,
+    vacioMsg: '<div style="color:var(--ink-faint);font-size:13px;">Sin datos de canalización en estos filtros.</div>'
   });
 
   // Incidencias a lo largo del tiempo, agrupadas por el periodo elegido con
@@ -2126,6 +2157,7 @@ function openStudentProfile(id){
           <span class="badge badge-sub">${i.subtipo}</span>
           <span class="badge badge-${i.gravedad}">${i.gravedad}</span>
           ${i.conflicto ? `<span class="badge badge-sub">Conflicto: ${i.conflicto}</span>` : ''}
+        ${i.canalizacion ? `<span class="badge badge-sub">Canalización: ${i.canalizacion}</span>` : ''}
           <span class="badge ${badgeEstadoClass(i.estado)}">${i.estado}</span>
         </div>
         <p class="inc-desc">${i.descripcion.replace(/</g,'&lt;')}</p>
@@ -2248,6 +2280,7 @@ function renderSeguimientoTimeline(){
             <span class="tl-fecha">${fmtDate(ev.fecha)}</span>
             <span class="badge badge-${ev.gravedad}">${ev.gravedad}</span>
             ${ev.conflicto ? `<span class="badge badge-sub">Conflicto: ${ev.conflicto}</span>` : ''}
+            ${ev.canalizacion ? `<span class="badge badge-sub">Canalización: ${ev.canalizacion}</span>` : ''}
             <span class="badge ${badgeEstadoClass(ev.estado)}">${ev.estado}</span>
           </div>
           <p class="tl-desc"><b>${ev.categoria} · ${ev.subtipo}</b><br>${ev.descripcion.replace(/</g,'&lt;')}</p>
