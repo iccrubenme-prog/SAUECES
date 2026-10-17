@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" translate="no">
 <head>
 <meta charset="UTF-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sauces · Incidencias de Comportamiento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1233,13 +1234,16 @@ function populateDashFiltros(){
 /* ---------- Categoría / subclasificación (formulario nuevo) ---------- */
 const newCategoria = document.getElementById('new-categoria');
 const newSubtipo = document.getElementById('new-subtipo');
+/** <option> con value explícito: si el navegador traduce la página (ej. Chrome
+ *  a inglés), el texto visible cambia pero el value no, y el guardado no falla. */
+function optHtml(v){ const e=String(v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); return `<option value="${e}">${v}</option>`; }
 function populateNewCategoria(){
-  newCategoria.innerHTML = CATEGORIA_LIST.map(c=>`<option>${c}</option>`).join('');
+  newCategoria.innerHTML = CATEGORIA_LIST.map(optHtml).join('');
   populateNewSubtipo();
 }
 function populateNewSubtipo(){
   const subs = CATEGORIAS[newCategoria.value] || [];
-  newSubtipo.innerHTML = subs.map(s=>`<option>${s}</option>`).join('');
+  newSubtipo.innerHTML = subs.map(optHtml).join('');
 }
 newCategoria.addEventListener('change', populateNewSubtipo);
 
@@ -1255,7 +1259,7 @@ function populateFiltroCategoria(){
 function populateFiltroSubtipo(){
   const subs = fCategoria.value ? CATEGORIAS[fCategoria.value] : [...new Set(Object.values(CATEGORIAS).flat())];
   const current = fSubtipo.value;
-  fSubtipo.innerHTML = '<option value="">Todas</option>' + subs.map(s=>`<option>${s}</option>`).join('');
+  fSubtipo.innerHTML = '<option value="">Todas</option>' + subs.map(optHtml).join('');
   if(subs.includes(current)) fSubtipo.value = current;
 }
 fCategoria.addEventListener('change', ()=>{ populateFiltroSubtipo(); renderHistorial(); });
@@ -1263,11 +1267,11 @@ fCategoria.addEventListener('change', ()=>{ populateFiltroSubtipo(); renderHisto
 /* ---------- Lugar / Estado (catálogos fijos LUGARES / ESTADOS_CAT) ---------- */
 function populateLugarYEstado(){
   const lugarSel = document.getElementById('new-lugar');
-  lugarSel.innerHTML = LUGARES.map(l=>`<option>${l.nombre}</option>`).join('');
+  lugarSel.innerHTML = LUGARES.map(l=>optHtml(l.nombre)).join('');
   const estadoSel = document.getElementById('new-estado');
-  estadoSel.innerHTML = ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
+  estadoSel.innerHTML = ESTADOS_CAT.map(e=>optHtml(e.nombre)).join('');
   const fEstado = document.getElementById('f-estado');
-  fEstado.innerHTML = '<option value="">Todos</option>' + ESTADOS_CAT.map(e=>`<option>${e.nombre}</option>`).join('');
+  fEstado.innerHTML = '<option value="">Todos</option>' + ESTADOS_CAT.map(e=>optHtml(e.nombre)).join('');
   populatePillGroup('new-gravedad', GRAVEDADES, v=>{ selectedGravedad = v; });
   populatePillGroup('new-conflicto', CONFLICTOS, v=>{ selectedConflicto = v; });
   populatePillGroup('new-canalizacion', CANALIZACIONES, v=>{ selectedCanalizacion = v; });
@@ -1485,6 +1489,15 @@ document.getElementById('btn-guardar').addEventListener('click', async ()=>{
     notifico: document.getElementById('new-notifico').checked,
     createdAt: new Date().toISOString()
   };
+  // Candado: no guardar si algún catálogo no se pudo convertir a su ID
+  const filaId = incidenciaTextoAFilaId(incident);
+  const faltan = [['lugar_id','Lugar'],['categoria_id','Categoría'],['subcategoria_id','Subcategoría'],['gravedad_id','Gravedad'],['estado_id','Estado']]
+    .filter(([k])=>filaId[k]==='' || filaId[k]==null || Number.isNaN(filaId[k])).map(([,n])=>n);
+  if(faltan.length){
+    showToast('No se guardó: no se reconoció ' + faltan.join(', ') + '. Recarga la página (Ctrl+F5) e inténtalo de nuevo.');
+    console.error('Catálogos sin ID', faltan, incident);
+    return;
+  }
   const btnGuardar = document.getElementById('btn-guardar');
   btnGuardar.disabled = true; btnGuardar.textContent = 'Guardando…';
   try{
@@ -2741,11 +2754,11 @@ function actualizarDashSeccionParaSesion(){
     const t = TEACHERS.find(x=>x.id===currentUser.teacherId);
     const seccionesPropias = t ? [...new Set(t.grupos.map(g=>g.seccion))] : [];
     selSeccion.innerHTML = '<option value="">Todas las secciones</option>' +
-      seccionesPropias.map(s=>`<option>${s}</option>`).join('');
+      seccionesPropias.map(optHtml).join('');
     selSeccion.value = '';
   } else {
     selSeccion.innerHTML = '<option value="">Todas las secciones</option>' +
-      SECCIONES_LIST.map(s=>`<option>${s}</option>`).join('');
+      SECCIONES_LIST.map(optHtml).join('');
   }
 }
 
