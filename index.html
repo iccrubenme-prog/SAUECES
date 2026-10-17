@@ -2286,10 +2286,18 @@ function renderSeguimientosAlumnosGrid(){
       <span class="badge-count has">${numIncidencias} incidencia${numIncidencias===1?'':'s'}${numSeguimientos ? ' · '+numSeguimientos+' seguimiento'+(numSeguimientos===1?'':'s') : ''}</span>
     </div>`;
   };
-  const seccion = (titulo, arr)=> arr.length ? `<p style="color:var(--ink-soft);font-size:13px;font-weight:600;margin:0 0 12px;">${titulo} (${arr.length})</p><div class="stu-grid" style="margin-bottom:26px;">${arr.map(tarjeta).join('')}</div>` : '';
+  const seccion = (titulo, arr, estado)=>{
+    if(!arr.length) return '';
+    const ids = new Set(arr.map(x=>x.id));
+    const nInc = scoped.filter(i=>i.estado===estado && ids.has(i.studentId)).length;
+    return `<p style="color:var(--ink-soft);font-size:13px;font-weight:600;margin:0 0 12px;">${titulo} (${arr.length} alumno${arr.length===1?'':'s'} · ${nInc} incidencia${nInc===1?'':'s'})</p><div class="stu-grid" style="margin-bottom:26px;">${arr.map(tarjeta).join('')}</div>`;
+  };
+  const resto = lista.filter(x=>!enSeg.has(x.id));
+  const conAbierta = new Set(scoped.filter(i=>i.estado==='Abierta').map(i=>i.studentId));
   grid.innerHTML =
-    seccion('En seguimiento', lista.filter(x=>enSeg.has(x.id))) +
-    seccion('Otras incidencias registradas', lista.filter(x=>!enSeg.has(x.id)));
+    seccion('En seguimiento', lista.filter(x=>enSeg.has(x.id)), 'En seguimiento') +
+    seccion('Abierta', resto.filter(x=>conAbierta.has(x.id)), 'Abierta') +
+    seccion('Cerrada', resto.filter(x=>!conAbierta.has(x.id)), 'Cerrada');
   grid.querySelectorAll('.stu-card').forEach(el=>{
     el.addEventListener('click', ()=>{
       seguimientoAlumnoSeleccionado = STUDENTS.find(s=>s.id===+el.dataset.id);
