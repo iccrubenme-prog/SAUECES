@@ -1227,7 +1227,7 @@ function populateGradoSelects(){
 function populateDashFiltros(){
   const sel = document.getElementById('dash-f-profesor');
   const actuales = TEACHERS.slice().sort((a,b)=>a.nombre.localeCompare(b.nombre));
-  sel.innerHTML = '<option value="">Todos</option>' + actuales.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('');
+  sel.innerHTML = '<option value="">Todos</option><option value="admin">Administrador</option>' + actuales.map(t=>`<option value="${t.id}">${t.nombre}</option>`).join('');
 }
 
 /* ---------- Categoría / subclasificación (formulario nuevo) ---------- */
@@ -1319,6 +1319,7 @@ document.getElementById('dash-f-limpiar').addEventListener('click', ()=>{
   document.getElementById('dash-f-seccion').value = '';
   document.getElementById('dash-f-grado').value = '';
   Object.keys(dashClickFilters).forEach(k=> dashClickFilters[k] = null);
+  dashPeriodo = null;
   renderDashboard();
 });
 
@@ -1330,12 +1331,23 @@ document.addEventListener('click', (e)=>{
   if(!e.target.closest('#view-dashboard .autocomplete')) dashAlumnoAcResults.classList.remove('show');
 });
 
+/** Incidencia levantada por el administrador (sin docente asociado). */
+function esIncidenciaDeAdmin(i){
+  return i.reportadoPorDocenteId == null && String(i.reportadoPor||'').trim().toLowerCase() === 'administrador';
+}
+
 function dashAlumnoOpciones(){
   if(currentUser.role==='teacher') return alumnosVisiblesParaSeguimiento();
   const profesorId = document.getElementById('dash-f-profesor').value;
   const seccion = document.getElementById('dash-f-seccion').value;
   const grado = document.getElementById('dash-f-grado').value;
-  let base = profesorId ? alumnosVisiblesParaDocente(Number(profesorId)) : STUDENTS;
+  let base = STUDENTS;
+  if(profesorId==='admin'){
+    const ids = new Set(INCIDENTS.filter(esIncidenciaDeAdmin).map(i=>i.studentId));
+    base = STUDENTS.filter(s=>ids.has(s.id));
+  } else if(profesorId){
+    base = alumnosVisiblesParaDocente(Number(profesorId));
+  }
   if(seccion) base = base.filter(s=>GRADO_SECCION[s.grado]===seccion);
   if(grado) base = base.filter(s=>s.grado===grado);
   return base;
@@ -1746,7 +1758,8 @@ function syncDashFiltros(){
   const selSeccion = document.getElementById('dash-f-seccion');
   const selGrado = document.getElementById('dash-f-grado');
 
-  const profesorId = selProf.value ? Number(selProf.value) : null;
+  const profesorEsAdmin = selProf.value === 'admin';
+  const profesorId = (selProf.value && !profesorEsAdmin) ? Number(selProf.value) : null;
   const seccionVal = selSeccion.value;
   const gradoVal = selGrado.value;
   const profesorSel = profesorId!=null ? TEACHERS.find(x=>x.id===profesorId) : null;
@@ -1776,9 +1789,9 @@ function syncDashFiltros(){
   if(gradoEfectivo) profesoresDisponibles = profesoresDisponibles.filter(t=>t.grupos.some(g=>g.grado===gradoEfectivo));
   profesoresDisponibles.sort((a,b)=>a.nombre.localeCompare(b.nombre));
   const profesorSigueValido = profesorId==null || profesoresDisponibles.some(t=>t.id===profesorId);
-  selProf.innerHTML = '<option value="">Todos</option>' +
+  selProf.innerHTML = '<option value="">Todos</option><option value="admin"'+(profesorEsAdmin?' selected':'')+'>Administrador</option>' +
     profesoresDisponibles.map(t=>`<option value="${t.id}"${t.id===profesorId?' selected':''}>${t.nombre}</option>`).join('');
-  if(!profesorSigueValido) selProf.value = '';
+  if(!profesorSigueValido && !profesorEsAdmin) selProf.value = '';
 }
 
 /* ---------- Dashboard ---------- */
@@ -1786,6 +1799,7 @@ function syncDashFiltros(){
  *  Reportes (estilo Power BI): categoría, subclasificación, lugar, gravedad,
  *  estado y conflicto. Grado, Alumno y Profesor reutilizan sus propios
  *  selects/buscador existentes en vez de tener aquí una entrada aparte. */
+let dashPeriodo = null; // {modo, key} al dar clic en un punto de la tendencia
 let dashClickFilters = { categoria:null, subtipo:null, lugar:null, gravedad:null, estado:null, conflicto:null, canalizacion:null };
 
 /** Activa/desactiva (toggle) un filtro por clic y vuelve a dibujar todo el
@@ -1870,7 +1884,8 @@ function renderDashboard(){
   const fAlumno = document.getElementById('dash-f-alumno').value.trim().toLowerCase();
   const fSeccion = document.getElementById('dash-f-seccion').value;
   const fGrado = document.getElementById('dash-f-grado').value;
-  if(fProfesorId) incidents = incidents.filter(i=>i.reportadoPorDocenteId===Number(fProfesorId));
+  if(fProfesorId === 'admin') incidents = incidents.filter(esIncidenciaDeAdmin);
+  else if(fProfesorId) incidents = incidents.filter(i=>i.reportadoPorDocenteId===Number(fProfesorId));
   if(fAlumno) incidents = incidents.filter(i=>i.studentName.toLowerCase().includes(fAlumno));
   if(fSeccion) incidents = incidents.filter(i=>GRADO_SECCION[i.grado]===fSeccion);
   if(fGrado) incidents = incidents.filter(i=>i.grado===fGrado);
@@ -1882,6 +1897,11 @@ function renderDashboard(){
   if(dashClickFilters.estado) incidents = incidents.filter(i=>i.estado===dashClickFilters.estado);
   if(dashClickFilters.conflicto) incidents = incidents.filter(i=>i.conflicto===dashClickFilters.conflicto);
   if(dashClickFilters.canalizacion) incidents = incidents.filter(i=>i.canalizacion===dashClickFilters.canalizacion);
+  // La tendencia se dibuja con todo lo anterior (para que siga visible la línea completa);
+  // el período elegido con clic filtra el resto del reporte.
+  const incidentsTendencia = incidents;
+  if(dashPeriodo && dashPeriodo.modo !== lineaAgrupacion) dashPeriodo = null;
+  if(dashPeriodo) incidents = incidents.filter(i=>i.fecha && claveDePeriodo(i.fecha, dashPeriodo.modo)===dashPeriodo.key);
 
   const total = incidents.length;
   const abiertas = incidents.filter(i=>i.estado!=='Cerrada').length;
@@ -1941,9 +1961,10 @@ function renderDashboard(){
     panelStudents.style.gridColumn = '';
     const byTeacher = {};
     incidents.forEach(i=>{
-      const key = i.reportadoPorDocenteId != null ? ('id:'+i.reportadoPorDocenteId) : ('txt:'+i.reportadoPor);
+      const esAdm = esIncidenciaDeAdmin(i);
+      const key = esAdm ? 'admin' : (i.reportadoPorDocenteId != null ? ('id:'+i.reportadoPorDocenteId) : ('txt:'+i.reportadoPor));
       const nombre = i.reportadoPor || 'Sin especificar';
-      byTeacher[key] = byTeacher[key] || {name:nombre, count:0, docenteId:i.reportadoPorDocenteId};
+      byTeacher[key] = byTeacher[key] || {name:esAdm?'Administrador':nombre, count:0, docenteId:esAdm?'admin':i.reportadoPorDocenteId};
       byTeacher[key].count++;
     });
     const topT = Object.values(byTeacher).sort((a,b)=>b.count-a.count).slice(0,6);
@@ -2006,7 +2027,7 @@ function renderDashboard(){
   // los botones (Día/Mes/Trimestre/Año). Se rellenan los periodos sin
   // incidencias con 0 para que la línea muestre la tendencia real.
   const porPeriodo = {};
-  incidents.forEach(i=>{
+  incidentsTendencia.forEach(i=>{
     if(!i.fecha) return;
     const key = claveDePeriodo(i.fecha, lineaAgrupacion);
     porPeriodo[key] = (porPeriodo[key]||0)+1;
@@ -2075,7 +2096,7 @@ function generarSerieCompleta(desde, hasta, modo, porPeriodo){
   let cursor = desde;
   let guard = 0;
   while(true){
-    out.push({ label: etiquetaDePeriodo(cursor, modo), value: porPeriodo[cursor] || 0 });
+    out.push({ key: cursor, label: etiquetaDePeriodo(cursor, modo), value: porPeriodo[cursor] || 0 });
     if(cursor === hasta || ++guard > 400) break;
     cursor = siguientePeriodo(cursor, modo);
   }
@@ -2118,9 +2139,13 @@ function renderLineChart(containerId, dataPoints){
     return `<text x="${p.x.toFixed(1)}" y="${h-8}" font-size="10" fill="var(--ink-faint)" text-anchor="middle">${p.label}</text>`;
   }).join('');
 
-  const dots = pts.map(p=>
-    `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="var(--primary)" stroke="#fff" stroke-width="1.5"><title>${p.label}: ${p.value}</title></circle>`
-  ).join('');
+  const dots = pts.map(p=>{
+    const sel = dashPeriodo && dashPeriodo.key===p.key;
+    const dim = dashPeriodo && !sel;
+    return `<g class="pt-linea" data-key="${p.key}" style="cursor:pointer;">
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="12" fill="transparent"/>
+      <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${sel?6:3.5}" fill="var(--primary)" opacity="${dim?0.3:1}" stroke="#fff" stroke-width="1.5"><title>${p.label}: ${p.value}</title></circle></g>`;
+  }).join('');
 
   el.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">
     ${grid}
@@ -2128,7 +2153,14 @@ function renderLineChart(containerId, dataPoints){
     <path d="${pathD}" fill="none" stroke="var(--primary)" stroke-width="2.5"/>
     ${dots}
     ${labels}
-  </svg>`;
+  </svg>` + (dashPeriodo ? `<div style="font-size:12px;color:var(--ink-faint);margin-top:4px;">Filtrando por período seleccionado · clic en el mismo punto para quitar</div>` : '');
+  el.querySelectorAll('.pt-linea').forEach(g=>{
+    g.addEventListener('click', ()=>{
+      const key = g.dataset.key;
+      dashPeriodo = (dashPeriodo && dashPeriodo.key===key) ? null : {modo: lineaAgrupacion, key};
+      renderDashboard();
+    });
+  });
 }
 
 /* ---------- Alumnos ---------- */
